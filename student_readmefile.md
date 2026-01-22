@@ -1,10 +1,7 @@
 # Stockify
 
 ## Présentation générale
-Ce projet consiste à développer **[description très courte du produit]**. 
-Garder la présentation courte et concise.
-
-L’objectif principal est de **[objectif du produit / problème résolu]**.
+Ce projet consiste a developper une application de portofolio de stocks en C# sur desktop windows.
 
 ---
 
@@ -17,8 +14,8 @@ L’objectif principal est de **[objectif du produit / problème résolu]**.
 
 ## Produit cible
 Le produit final est destiné à :
-* Type d’utilisateur : [ex. joueur, client, entreprise]
-* Plateforme cible : [PC, Web, Mobile, VR, etc.]
+* Type d’utilisateur : Investisseurs, Jeunes curieux souhaitant debuter l'investissement.
+* Plateforme cible : PC desktop
 ---
 
 ## Structure du dépôt
