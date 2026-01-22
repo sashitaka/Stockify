@@ -9,7 +9,7 @@ L’objectif principal est de **[objectif du produit / problème résolu]**.
 ---
 
 ## Équipe
-- Prénom Nom - Num Étudiant
+- Prénom Nom - Cédrick Maranda
 - Prénom Nom - Num Étudiant
 - Prénom Nom - Num Étudiant
 
