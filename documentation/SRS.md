@@ -1,14 +1,14 @@
 # Cahier des charges (SRS léger) — <Nom du projet>
-**Équipe :** <Noms>  
-**Date :** <YYYY-MM-DD>  
+**Équipe : Les sharks (Cedrick, Sasha, Jordann)  
+**Date :** 2026-01-22  
 **Version :** <v0.1 / v1.0>
 
 ---
 
 ## 1. Contexte & objectif
-- **Contexte :** <Pourquoi ce projet existe?>
-- **Objectif principal :** <Valeur attendue / problème résolu>
-- **Parties prenantes :** <utilisateurs, client, admin, etc.>
+- **Contexte :** De nos jours, l'economie est en danger et en declin au moins au canada, la recherche de revenue alternatif est en vogue surtout parmi les jeunes curieux investisseurs.
+- **Objectif principal :** Offrir  une platforme simple, intuitive et transparente pour les investisseurs.
+- **Parties prenantes :** Investisseurs , Stockify admin.
 
 ---
 
