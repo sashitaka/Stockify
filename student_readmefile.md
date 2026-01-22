@@ -1,7 +1,7 @@
 # Stockify
 
 ## Présentation générale
-Ce projet consiste a developper une application de portofolio de stocks en C# sur desktop windows.
+Ce projet consiste a developper une application de portofolio de stocks en C# sur desktop windows permettant une multitude de fonctionnalites.
 
 ---
 
