@@ -1,4 +1,4 @@
-# Nom du projet
+# Stockify
 
 ## Présentation générale
 Ce projet consiste à développer **[description très courte du produit]**. 
@@ -10,8 +10,8 @@ L’objectif principal est de **[objectif du produit / problème résolu]**.
 
 ## Équipe
 - 2023320222 - Cédrick Maranda
-- Prénom Nom - Num Étudiant
-- Prénom Nom - Num Étudiant
+- Sasha le Blanc 2334933
+- Jordann Aspirot-Horth
 
 ---
 
