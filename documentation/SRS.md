@@ -7,8 +7,8 @@
 
 ## 1. Contexte & objectif
 - **Contexte :** De nos jours, l'economie est en danger et en declin au moins au canada, la recherche de revenue alternatif est en vogue surtout parmi les jeunes curieux investisseurs.
-- **Objectif principal :** Offrir  une platforme simple, intuitive et transparente pour les investisseurs.
-- **Parties prenantes :** Investisseurs , Stockify admin.
+- **Objectif principal :** Offrir une platforme simple, intuitive et transparente de portfolio de stocks pour les investisseurs.
+- **Parties prenantes :** Investisseurs, Stockify admin.
 
 ---
 
