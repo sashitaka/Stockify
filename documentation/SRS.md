@@ -41,7 +41,8 @@ OUT-2 : Gestion fiscale complète.
 - **FR-2 :** Le système doit pouvoir montrer a l'utilisateur connecter son portfolio qui contient chaque stocks qui possede, chaque stock avec sa valeur investis a date par le user.
 - **FR-3 :** Le system doit inclure une barre de recherche universelle dans l'application qui permet de rechercher une stock grace a son nom que ca soit dans le portfolio personnel ou dans la liste de stock de notre platforme. Cette barre de recherche inclut une boutton qui offre different filtre a appliquer aussi.
 - **FR-4 :** Le system doit avoir un bouton ou un onglet pour afficher la liste de stock totale que notre application offre, en appuyant sur une des stocks, on trouve une page similaire a celle de notre portfolio lorsqu'on click sur une de nos stock. Il est affiche la valeur actuelle de la stock, un graph montrant son evolution et une multitude d'autres informations a propos d'elle.
-- **FR-5 :** Le system doit permettre la vente et achat de n'importe que stock disponible directement sur la page qui affiche les infos sur une stock particuliere. La vente de stock se fait uniquement depuis notre portfolio evidemment. En appuyant sur le bouton vente/achat nous amene sur une page qui nous permet de rentrer le montant specifique de stock ou la valeur precis que l'on souhaite acheter/vendre.
+- **FR-5 :** Le system doit permettre la vente et achat de n'importe que stock disponible directement sur la page qui affiche les infos sur une stock particuliere. La vente de stock se fait uniquement depuis notre portfolio evidemment. En appuyant sur le bouton vente/achat cela nous amene sur une page qui nous permet de rentrer le montant specifique de stock ou la valeur precis que l'on souhaite acheter/vendre puis un bouton pour confirmer la transaction.
+- **FR-5 :** Le system doit avoir un onglet qui affiche toutes les anciennes transactions effectuer sur l'application par le user et leur infos. 
 
 ---
 
@@ -55,10 +56,10 @@ OUT-2 : Gestion fiscale complète.
 ---
 
 ## 6. Contraintes
-- **C-1 (Technologie) :** <C# .NET / probablement WPF pour un UI moderne.>
-- **C-2 (Plateforme) :** <Desktop Windows>
-- **C-3 (Délai) :** <Lancement du projet (8 janvier au 25 Janvier 2026), Analyse, exigences et premiers patrons (26 janvier au 22 février 2026), Raffinement architectural et conception avancée (23 février au 22 mars 2026).  Intégration, optimisation et robustesse (23 mars au 19 Avril)>
-- **C-4 (Outils) :** <Git + gestion tâches (Trello/Jira) + Visual Studio>
+- **C-1 (Technologie) :** C# .NET / probablement WPF pour un UI moderne.
+- **C-2 (Plateforme) :** Desktop Windows
+- **C-3 (Délai) :** Lancement du projet (8 janvier au 25 Janvier 2026), Analyse, exigences et premiers patrons (26 janvier au 22 février 2026), Raffinement architectural et conception avancée (23 février au 22 mars 2026).  Intégration, optimisation et robustesse (23 mars au 19 Avril)
+- **C-4 (Outils) :** Git + gestion tâches (Trello/Jira) + Visual Studio
 
 ---
 
