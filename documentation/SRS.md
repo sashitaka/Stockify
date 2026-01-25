@@ -49,10 +49,10 @@ OUT-2 : Gestion fiscale complète.
 
 ## 5. Exigences non fonctionnelles (NFR)
 > Performance / sécurité / disponibilité / UX / maintenabilité…
-- **NFR-1 (Performance) :** <ex. temps de réponse < 2s>
-- **NFR-2 (Sécurité) :** <ex. authentification requise>
-- **NFR-3 (UX) :** <ex. parcours en ≤ 3 clics>
-- **NFR-4 (Qualité) :** <ex. couverture minimale de tests>
+- **NFR-1 (Performance) :** temps de chargement en dessous de 2s. Application non intensive pour les systems moins performants.
+- **NFR-2 (Sécurité) :** Authentification requise au lancement de l'application et possibilite d'ajouter la verification par email ou par SMS
+- **NFR-3 (UX) :** UI tres simple et intuitif, parcours de l'application en 1-2 onglets
+- **NFR-4 (Qualité) :** bonne integration et compatibilite avec les systems windows desktop.
 
 ---
 
