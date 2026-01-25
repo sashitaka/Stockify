@@ -14,18 +14,24 @@
 
 ## 2. Portée (Scope)
 ### 2.1 Inclus (IN)
-- IN-1 : <fonction / cas d’usage inclus>
-- IN-2 : <...>
+IN-1 : Authentification + profil utilisateur.
+IN-2 : Recherche de titres (actions/ETFs) par symbole ou nom.
+IN-3 : Affichage des infos d’un titre : prix, variation, volume, graphique historique.
+IN-4 : Watchlist (liste de suivi) personnalisée.
+IN-5 : Portefeuille virtuel (cash + positions) et valeur totale.
+IN-6 : Simulation d’ordres (achat/vente) au prix du marché (market) + historique des transactions.
+IN-7 : Indicateurs simples.
+IN-8 : Export des transactions/portefeuille (CSV).
 
 ### 2.2 Exclu (OUT)
-- OUT-1 : <fonction explicitement hors scope>
-- OUT-2 : <...>
+OUT-1 : Produits complexes (options, futures, margin, short selling) 
+OUT-2 : Gestion fiscale complète.
 
 ---
 
 ## 3. Acteurs / profils utilisateurs
-- **Acteur A :** <rôle, besoins, contraintes>
-- **Acteur B :** <...>
+- **Acteur A :** <Investisseur,suivre des titres, comprendre l’évolution, tester des achats/ventes sans risque, veut une UI simple avec des résultats clairs.>
+- **Acteur B :** <Admin , gérer utilisateurs>
 
 ---
 
@@ -46,10 +52,10 @@
 ---
 
 ## 6. Contraintes
-- **C-1 (Technologie) :** <langage / framework imposé>
-- **C-2 (Plateforme) :** <web / mobile / desktop>
-- **C-3 (Délai) :** <dates de phases>
-- **C-4 (Outils) :** <Git, CI, etc.>
+- **C-1 (Technologie) :** <C# .NET / probablement WPF pour un UI moderne.>
+- **C-2 (Plateforme) :** <Desktop Windows>
+- **C-3 (Délai) :** <Lancement du projet (8 janvier au 25 Janvier 2026), Analyse, exigences et premiers patrons (26 janvier au 22 février 2026), Raffinement architectural et conception avancée (23 février au 22 mars 2026).  Intégration, optimisation et robustesse (23 mars au 19 Avril)>
+- **C-4 (Outils) :** <Git + gestion tâches (Trello/Jira) + Visual Studio>
 
 ---
 
