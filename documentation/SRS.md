@@ -1,7 +1,7 @@
 # Cahier des charges (SRS léger) — <Nom du projet>
 **Équipe : Les sharks (Cedrick, Sasha, Jordann)  
 **Date :** 2026-01-22  
-**Version :** <v0.1 / v1.0>
+**Version :** v0.1 / v1.0
 
 ---
 
@@ -30,8 +30,8 @@ OUT-2 : Gestion fiscale complète.
 ---
 
 ## 3. Acteurs / profils utilisateurs
-- **Acteur A :** <Investisseur,suivre des titres, comprendre l’évolution, tester des achats/ventes sans risque, veut une UI simple avec des résultats clairs.>
-- **Acteur B :** <Admin , gérer utilisateurs>
+- **Acteur A :** Investisseur, suivre des titres, comprendre l’évolution, completer des achats/ventes, veut une UI simple avec des résultats clairs.
+- **Acteur B :** Admin , gérer utilisateurs
 
 ---
 
@@ -50,7 +50,7 @@ OUT-2 : Gestion fiscale complète.
 ## 5. Exigences non fonctionnelles (NFR)
 > Performance / sécurité / disponibilité / UX / maintenabilité…
 - **NFR-1 (Performance) :** temps de chargement en dessous de 2s. Application non intensive pour les systems moins performants.
-- **NFR-2 (Sécurité) :** Authentification requise au lancement de l'application et possibilite d'ajouter la verification par email ou par SMS
+- **NFR-2 (Sécurité) :** Authentification requise au lancement de l'application et possibilite d'ajouter la verification par email ou par SMS. Code robuste qui assure un program anti-piratation.
 - **NFR-3 (UX) :** UI tres simple et intuitif, parcours de l'application en 1-2 onglets
 - **NFR-4 (Qualité) :** bonne integration et compatibilite avec les systems windows desktop.
 
