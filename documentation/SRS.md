@@ -65,32 +65,32 @@ OUT-2 : Gestion fiscale complète.
 ---
 
 ## 7. Données & règles métier (si applicable)
-- **7.1 Entités principales :**
--   EP-1: User: Identifie un utilisateur
--               Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, Email, Rôle(CLIENT, ADMIN), Solde, Devise, StatutDeCompte
--   EP-2: Actions: Représente une action cotée en bourse
--               Attributs principaux: IdentifiantBoursier, NomEntreprise, Devise, Valeur
--   EP-3: Transaction: Gestion d'une transaction
--               Attributs principaux: IdentifiantTransaction, IdentifiantUtilisateur, Type(Achat,Vente), IdentifiantBoursier, Quantité, Valeur, Total, Date, StatutDeTransaction
--   EP-4: Portfolio: Totalité des actions d'un utilisateur
--               Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, IdentifiantBoursier, NomEntreprise, Quantité, Valeur
-- Règles métier :
-- Règles de validation (RV):
+###7.1 Entités principales :**
+-   #EP-1: User: Identifie un utilisateur
+-   Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, Email, Rôle(CLIENT, ADMIN), Solde, Devise, StatutDeCompte
+-   #EP-2: Actions: Représente une action cotée en bourse
+-   Attributs principaux: IdentifiantBoursier, NomEntreprise, Devise, Valeur
+-   #EP-3: Transaction: Gestion d'une transaction
+-   Attributs principaux: IdentifiantTransaction, IdentifiantUtilisateur, Type(Achat,Vente), IdentifiantBoursier, Quantité, Valeur, Total, Date, StatutDeTransaction
+-   #EP-4: Portfolio: Totalité des actions d'un utilisateur
+-   Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, IdentifiantBoursier, NomEntreprise, Quantité, Valeur
+###Règles métier :
+ Règles de validation (RV):
 -   RV-1: Un utilisateur doit être actif pour réaliser une transaction.
 -   RV-2: La quantité d'une transaction doit être suppérieur à 0.
 -   RV-3: Une transaction d'achat peut seulement être réaliser si le solde du compte est suppérieur à la valeur de la transaction.
 -   RV-4: Une transaction de vente peut seulement être réaliser si la quantité d'action vendu est inférieur à la quantité possédée.
 
-- Règles de calcul (RC):
+ Règles de calcul (RC):
 -  RC-1: Le total d'une transaction correspond à: quantité * valeur.
 -  RC-2: Le solde est mis à jour après chaque transaction complété.
 -  RC-3: La valeur est recalculer à partir de la valeur actuel des actions.
 
-- Règles de gestion de statut (RGS):
+ Règles de gestion de statut (RGS):
 -  RGS-1: Une transaction peut être: EN_ATTENTE, ANNULÉ, COMPLÉTÉ, EN_COURT.
 -  RGS-2: Un compte peut être: ACTIF, INNACTIF, BANNI.
 
-- Règles de permissions (RP):
+ Règles de permissions (RP):
 -  RP-1: Un User de type CLIENT peut uniquement consulter son propre Portfolio ou passer, annulé et consulté ses propres Transactions.
 -  RP-2: Un User de type ADMIN peut consulter les informations de tout les autres comptes mais ne peut pas passer de Transaction.
 
