@@ -8,7 +8,7 @@ Ce projet consiste a developper une application de portofolio de stocks en C# su
 ## Équipe
 - 2023320222 - Cédrick Maranda
 - Sasha le Blanc 2334933
-- Jordann Aspirot-Horth
+- Jordann Aspirot-Horth 2335387
 
 ---
 
