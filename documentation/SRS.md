@@ -65,14 +65,14 @@ OUT-2 : Gestion fiscale complète.
 ---
 
 ## 7. Données & règles métier (si applicable)
-###7.1 Entités principales :**
--   #EP-1: User: Identifie un utilisateur
+###7.1 Entités principales :
+  #EP-1: User: Identifie un utilisateur
 -   Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, Email, Rôle(CLIENT, ADMIN), Solde, Devise, StatutDeCompte
--   #EP-2: Actions: Représente une action cotée en bourse
+  #EP-2: Actions: Représente une action cotée en bourse
 -   Attributs principaux: IdentifiantBoursier, NomEntreprise, Devise, Valeur
--   #EP-3: Transaction: Gestion d'une transaction
+  #EP-3: Transaction: Gestion d'une transaction
 -   Attributs principaux: IdentifiantTransaction, IdentifiantUtilisateur, Type(Achat,Vente), IdentifiantBoursier, Quantité, Valeur, Total, Date, StatutDeTransaction
--   #EP-4: Portfolio: Totalité des actions d'un utilisateur
+  #EP-4: Portfolio: Totalité des actions d'un utilisateur
 -   Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, IdentifiantBoursier, NomEntreprise, Quantité, Valeur
 ###Règles métier :
  Règles de validation (RV):
