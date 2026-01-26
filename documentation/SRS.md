@@ -6,7 +6,7 @@
 ---
 
 ## 1. Contexte & objectif
-- **Contexte :** De nos jours, l'economie est en danger et en declin au moins au canada, la recherche de revenue alternatif est en vogue surtout parmi les jeunes curieux investisseurs.
+- **Contexte :** De nos jours, le pouvoir d'achat est en danger et en declin au moins au canada, la recherche de revenue alternatif est en vogue surtout parmi les jeunes investisseurs curieux.
 - **Objectif principal :** Offrir une platforme simple, intuitive et transparente de portfolio de stocks pour les investisseurs.
 - **Parties prenantes :** Investisseurs, Stockify admin.
 
@@ -39,7 +39,7 @@ OUT-2 : Gestion fiscale complète.
 > Forme recommandée : “Le système doit…”
 - **FR-1 :** Le système doit authentifier les utilisateurs grace a une page de login ou une page de creation de compte grace au courriel et un mot de passe.
 - **FR-2 :** Le système doit pouvoir montrer a l'utilisateur connecter son portfolio qui contient chaque stocks qui possede, chaque stock avec sa valeur investis a date par le user.
-- **FR-3 :** Le system doit inclure une barre de recherche universelle dans l'application qui permet de rechercher une stock grace a son nom que ca soit dans le portfolio personnel ou dans la liste de stock de notre platforme. Cette barre de recherche inclut une boutton qui offre different filtre a appliquer aussi.
+- **FR-3 :** Le system doit inclure une barre de recherche universelle dans l'application qui permet de rechercher une stock grace a son nom que ce soit dans le portfolio personnel ou dans la liste de stock de notre platforme. Cette barre de recherche inclut une boutton qui offre different filtre a appliquer aussi.
 - **FR-4 :** Le system doit avoir un bouton ou un onglet pour afficher la liste de stock totale que notre application offre, en appuyant sur une des stocks, on trouve une page similaire a celle de notre portfolio lorsqu'on click sur une de nos stock. Il est affiche la valeur actuelle de la stock, un graph montrant son evolution et une multitude d'autres informations a propos d'elle.
 - **FR-5 :** Le system doit permettre la vente et achat de n'importe que stock disponible directement sur la page qui affiche les infos sur une stock particuliere. La vente de stock se fait uniquement depuis notre portfolio evidemment. En appuyant sur le bouton vente/achat cela nous amene sur une page qui nous permet de rentrer le montant specifique de stock ou la valeur precis que l'on souhaite acheter/vendre puis un bouton pour confirmer la transaction.
 - **FR-6 :** Le system doit avoir un onglet qui affiche toutes les anciennes transactions effectuer sur l'application par le user et leur infos.
@@ -65,19 +65,47 @@ OUT-2 : Gestion fiscale complète.
 ---
 
 ## 7. Données & règles métier (si applicable)
-- **Entités principales :** <User, Order, ...>
-- **Règles métier :** <validation, calculs, permissions, etc.>
+- **7.1 Entités principales :**
+-   EP-1: User: Identifie un utilisateur
+-               Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, Email, Rôle(CLIENT, ADMIN), Solde, Devise, StatutDeCompte
+-   EP-2: Actions: Représente une action cotée en bourse
+-               Attributs principaux: IdentifiantBoursier, NomEntreprise, Devise, Valeur
+-   EP-3: Transaction: Gestion d'une transaction
+-               Attributs principaux: IdentifiantTransaction, IdentifiantUtilisateur, Type(Achat,Vente), IdentifiantBoursier, Quantité, Valeur, Total, Date, StatutDeTransaction
+-   EP-4: Portfolio: Totalité des actions d'un utilisateur
+-               Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, IdentifiantBoursier, NomEntreprise, Quantité, Valeur
+- Règles métier :
+- Règles de validation (RV):
+-   RV-1: Un utilisateur doit être actif pour réaliser une transaction.
+-   RV-2: La quantité d'une transaction doit être suppérieur à 0.
+-   RV-3: Une transaction d'achat peut seulement être réaliser si le solde du compte est suppérieur à la valeur de la transaction.
+-   RV-4: Une transaction de vente peut seulement être réaliser si la quantité d'action vendu est inférieur à la quantité possédée.
+
+- Règles de calcul (RC):
+-  RC-1: Le total d'une transaction correspond à: quantité * valeur.
+-  RC-2: Le solde est mis à jour après chaque transaction complété.
+-  RC-3: La valeur est recalculer à partir de la valeur actuel des actions.
+
+- Règles de gestion de statut (RGS):
+-  RGS-1: Une transaction peut être: EN_ATTENTE, ANNULÉ, COMPLÉTÉ, EN_COURT.
+-  RGS-2: Un compte peut être: ACTIF, INNACTIF, BANNI.
+
+- Règles de permissions (RP):
+-  RP-1: Un User de type CLIENT peut uniquement consulter son propre Portfolio ou passer, annulé et consulté ses propres Transactions.
+-  RP-2: Un User de type ADMIN peut consulter les informations de tout les autres comptes mais ne peut pas passer de Transaction.
 
 ---
 
 ## 8. Hypothèses & dépendances
 ### 8.1 Hypothèses
-- H-1 : <ex. utilisateurs ont un compte>
-- H-2 : <...>
+- H-1 : Les utilisateurs ont une connection internet.
+- H-2 : Les utilisateurs ont un ordinateur.
+- H-3 : Les utilisateurs utilisent le systeme d'exploitation windows 11.
+- H-4 : Les utilisateurs ont un compte bancaire pour réaliser des transactions.
 
 ### 8.2 Dépendances
-- D-1 : <API externe / BD / service>
-- D-2 : <...>
+- D-1 : Accès a une API gratuite de marcher boursier.
+
 
 ---
 
