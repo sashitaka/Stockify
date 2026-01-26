@@ -74,7 +74,7 @@ OUT-2 : Gestion fiscale complète.
 -   Attributs principaux: IdentifiantTransaction, IdentifiantUtilisateur, Type(Achat,Vente), IdentifiantBoursier, Quantité, Valeur, Total, Date, StatutDeTransaction
   EP-4: Portfolio: Totalité des actions d'un utilisateur
 -   Attributs principaux: IdentifiantUtilisateur, NomUtilisateur, IdentifiantBoursier, NomEntreprise, Quantité, Valeur
-  Règles métier :
+##  Règles métier :
  Règles de validation (RV):
 -   RV-1: Un utilisateur doit être actif pour réaliser une transaction.
 -   RV-2: La quantité d'une transaction doit être suppérieur à 0.
