@@ -5,4 +5,4 @@
 
 Diagramme de classe
 
-![Diagramme de classe Image](/documentation/ImageDiagrammeClass.png)
+![Diagramme de classe Image](ImgDiagrammeClass.png)
