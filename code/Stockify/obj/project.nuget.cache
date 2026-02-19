@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "E2g33qwMMCc=",
+  "success": true,
+  "projectFilePath": "C:\\Visual Studio 2022\\Stockify\\Stockify\\Stockify.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\sasha\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.3\\microsoft.aspnetcore.app.internal.assets.10.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
