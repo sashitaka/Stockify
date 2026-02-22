@@ -12,6 +12,7 @@ Classe user qui represente un utilisateur avec comme attributs ses informations 
 
 
 Diagramme de Cas d'utilisation
+Ce diagramme montre les principales actions possibles dans l’application Stockify. Il y a deux acteurs : l’utilisateur et l’administrateur. Les deux peuvent se connecter, naviguer dans la liste des stocks et se déconnecter. L’utilisateur, lui, peut en plus acheter des stocks, consulter son portefeuille, vendre des actions et voir l’historique de ses transactions.
 
 ![Diagramme Cas d'utilisation](CasDutilisation.png)
 
