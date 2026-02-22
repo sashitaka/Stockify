@@ -41,7 +41,7 @@ Together, they provide a clear, professional, and maintainable documentation fra
 
 
 ## Documentation Tree
-- [SRS](documentation\SRS.md)
+- [SRS.md](documentation/SRS.md)
 - [ADR.md](ADR.md)
 
 ## Students tasks
