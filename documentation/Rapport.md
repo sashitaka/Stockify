@@ -10,3 +10,11 @@ Classe user qui represente un utilisateur avec comme attributs ses informations 
 ![Diagramme de classe Image](ImgDiagrammeClass.png)
 
 
+
+Diagramme de Cas d'utilisation
+
+
+
+
+
+![Diagramme Cas d'utilisation](CasDutilisation.png)
