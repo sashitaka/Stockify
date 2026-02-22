@@ -19,6 +19,8 @@ Ce diagramme montre les principales actions possibles dans l’application Stock
 
 Diagramme de composantes
 
+Ce diagramme montre l’architecture de Stockify en couches. L’UI (site web + dashboard admin) appelle les services du Core (Users, Transactions, Portfolio). Le Core utilise l’Infrastructure pour la sécurité, la persistance (BD) et l’intégration des stocks. L’infrastructure communique avec l’API Massive.com (HTTPS) et la base SQL Server.
+
 ![Diagramme Composantes](diagramme_Composant.png)
 
 
