@@ -13,8 +13,10 @@ Classe user qui represente un utilisateur avec comme attributs ses informations 
 
 Diagramme de Cas d'utilisation
 
-
-
-
-
 ![Diagramme Cas d'utilisation](CasDutilisation.png)
+
+
+Diagramme de composantes
+
+![Diagramme Composantes](diagramme_Composant.png)
+
