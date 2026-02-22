@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Stockify")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7d106e4927e25cae10c7229d4168fdd33ad9ce60")]
 [assembly: System.Reflection.AssemblyProductAttribute("Stockify")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Stockify")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

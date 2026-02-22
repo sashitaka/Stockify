@@ -45,53 +45,53 @@ wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
 wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 Components\Layout\ReconnectModal.razor.js
-C:\Users\sasha\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.web.js
-C:\Users\sasha\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.server.js
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\app.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.js
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
-C:\Visual Studio 2022\Stockify\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
-C:\Visual Studio 2022\Stockify\Stockify\Components\Layout\ReconnectModal.razor.js
-C:\Users\sasha\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.web.js
-C:\Users\sasha\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.server.js
+C:\Users\SashaPC\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.web.js
+C:\Users\SashaPC\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\build\..\_framework\blazor.server.js
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\app.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.js
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
+A:\visual studio 2022\IMPLEMENTATIONPROJECT\Stockify\code\Stockify\Components\Layout\ReconnectModal.razor.js
+C:\Users\SashaPC\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.web.js
+C:\Users\SashaPC\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.3\_framework\blazor.server.js

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Visual Studio 2022\\Stockify\\Stockify\\Stockify.csproj": {}
+    "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj": {}
   },
   "projects": {
-    "C:\\Visual Studio 2022\\Stockify\\Stockify\\Stockify.csproj": {
+    "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Visual Studio 2022\\Stockify\\Stockify\\Stockify.csproj",
+        "projectUniqueName": "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj",
         "projectName": "Stockify",
-        "projectPath": "C:\\Visual Studio 2022\\Stockify\\Stockify\\Stockify.csproj",
-        "packagesPath": "C:\\Users\\sasha\\.nuget\\packages\\",
-        "outputPath": "C:\\Visual Studio 2022\\Stockify\\Stockify\\obj\\",
+        "projectPath": "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj",
+        "packagesPath": "C:\\Users\\SashaPC\\.nuget\\packages\\",
+        "outputPath": "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\sasha\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\SashaPC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
