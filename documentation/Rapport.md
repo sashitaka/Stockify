@@ -20,3 +20,8 @@ Diagramme de composantes
 
 ![Diagramme Composantes](diagramme_Composant.png)
 
+
+
+Diagramme d'entite relationnelle
+
+![Diagramme Entite relationnelle](ImgDiagrammeEntiteRelation.PNG)
