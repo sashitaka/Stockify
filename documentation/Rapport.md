@@ -1,6 +1,18 @@
 
 # Rapport Stockify
 
+### Correction apporte suite aux commentaire du livrable 1
+
+Le lien vers le SRS.md dans le README.md a ete corriger et est maintenant fonctionnelle.
+
+
+
+
+
+
+
+
+
 ### Diagrammes
 
 Diagramme de classe
