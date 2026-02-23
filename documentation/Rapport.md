@@ -33,4 +33,6 @@ Ce diagramme montre l’architecture de Stockify en couches. L’UI (site web + 
 
 ### Diagramme d'entite relationnelle
 
+Ce diagramme montre l'architecture de la base de donnée. La table Utilisateur contient les informations d'identification des différents utilisateurs ainsi que le solde du compte. La table Action contient les différentes actions existante, de quel entreprise elles sont ainsi que la valeur unitaire de l'action. La table possession entre en relation avec les tables Utilisateur et action pour établir le portefeuille actuel des individus à partir d'un utilisateur, l'action et la quantité de l'action. La table Transaction entre en relation avec les tables Utilisateur et action pour établir l'historique des transaction en concervant l'utilisateur, l'action, le type de transaction, la valeur de la transaction, la quantité d'action ainsi que la date de la transaction. Finalement, la table Administrateur contient les utilisateurs avec des droits d'accès au fonctionnalité restreinte de l'application.
+
 ![Diagramme Entite relationnelle](ImgDiagrammeEntiteRelation.PNG)
