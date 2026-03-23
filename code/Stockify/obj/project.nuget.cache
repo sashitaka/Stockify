@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "RGyVLmVWk8k=",
+  "dgSpecHash": "SoOq6lCaD2I=",
   "success": true,
-  "projectFilePath": "C:\\Users\\famil\\source\\repos\\sashitaka\\Stockify\\code\\Stockify\\Stockify.csproj",
+  "projectFilePath": "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\famil\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.5\\microsoft.aspnetcore.app.internal.assets.10.0.5.nupkg.sha512"
+    "C:\\Users\\sasha\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.5\\microsoft.aspnetcore.app.internal.assets.10.0.5.nupkg.sha512"
   ],
   "logs": []
 }

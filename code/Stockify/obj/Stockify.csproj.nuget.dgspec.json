@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\famil\\source\\repos\\sashitaka\\Stockify\\code\\Stockify\\Stockify.csproj": {}
+    "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj": {}
   },
   "projects": {
-    "C:\\Users\\famil\\source\\repos\\sashitaka\\Stockify\\code\\Stockify\\Stockify.csproj": {
+    "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\famil\\source\\repos\\sashitaka\\Stockify\\code\\Stockify\\Stockify.csproj",
+        "projectUniqueName": "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj",
         "projectName": "Stockify",
-        "projectPath": "C:\\Users\\famil\\source\\repos\\sashitaka\\Stockify\\code\\Stockify\\Stockify.csproj",
-        "packagesPath": "C:\\Users\\famil\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\famil\\source\\repos\\sashitaka\\Stockify\\code\\Stockify\\obj\\",
+        "projectPath": "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj",
+        "packagesPath": "C:\\Users\\sasha\\.nuget\\packages\\",
+        "outputPath": "C:\\GitRepositories\\Stockify\\code\\Stockify\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\famil\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sasha\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

@@ -58,3 +58,9 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.gradientPageTest {
+    background: linear-gradient(45deg, blue, green);
+    min-height: 100vh;
+    color: white;
+}
