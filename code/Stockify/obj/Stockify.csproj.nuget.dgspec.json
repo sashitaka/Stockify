@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj": {}
+    "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj": {}
   },
   "projects": {
-    "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj": {
+    "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj",
+        "projectUniqueName": "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj",
         "projectName": "Stockify",
-        "projectPath": "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\Stockify.csproj",
-        "packagesPath": "C:\\Users\\SashaPC\\.nuget\\packages\\",
-        "outputPath": "A:\\visual studio 2022\\IMPLEMENTATIONPROJECT\\Stockify\\code\\Stockify\\obj\\",
+        "projectPath": "C:\\GitRepositories\\Stockify\\code\\Stockify\\Stockify.csproj",
+        "packagesPath": "C:\\Users\\sasha\\.nuget\\packages\\",
+        "outputPath": "C:\\GitRepositories\\Stockify\\code\\Stockify\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\SashaPC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sasha\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -45,7 +45,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -54,7 +54,7 @@
             "Microsoft.AspNetCore.App.Internal.Assets": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.3, )",
+              "version": "[10.0.5, )",
               "autoReferenced": true
             }
           },
@@ -77,7 +77,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
