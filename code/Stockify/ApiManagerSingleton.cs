@@ -6,7 +6,7 @@ namespace Stockify
     {
         private static ApiManagerSingleton instance;
 
-        private string apiKey;
+        private const string apiKey = "nqSHuJEa1PCoJNT9cXXjWaJ1WOHK0QqD";
         private string baseURL;
         private bool isOnline;
         private JsonConverter jsonConverter;
@@ -15,7 +15,7 @@ namespace Stockify
         {
         }
 
-        public string ApiKey { get => apiKey; set => apiKey = value; }
+        public string ApiKey { get => apiKey;}
         public string BaseURL { get => baseURL; set => baseURL = value; }
         public bool IsOnline { get => isOnline; set => isOnline = value; }
         public JsonConverter JsonConverter { get => jsonConverter; set => jsonConverter = value; }
