@@ -1,0 +1,57 @@
+﻿@page "/login"
+@inject NavigationManager Navigation
+
+<div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#0f0f0f;">
+    <div style="background:#1a1a1a; padding:40px; border-radius:12px; width:360px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        
+        <h2 style="color:white; text-align:center; margin-bottom:8px;">Stockify</h2>
+        <p style="color:#888; text-align:center; margin-bottom:30px;">Connectez-vous à votre compte</p>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="background:#ff444422; border:1px solid #ff4444; color:#ff4444; padding:10px; border-radius:8px; margin-bottom:16px;">
+                @errorMessage
+            </div>
+        }
+
+        <div style="margin-bottom:16px;">
+            <label style="color:#aaa; font-size:14px;">Email</label>
+            <input @bind="email" type="email" placeholder="exemple@email.com"
+                   style="width:100%; padding:10px; margin-top:6px; background:#2a2a2a; border:1px solid #333; border-radius:8px; color:white; font-size:14px; box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:24px;">
+            <label style="color:#aaa; font-size:14px;">Mot de passe</label>
+            <input @bind="password" type="password" placeholder="••••••••"
+                   style="width:100%; padding:10px; margin-top:6px; background:#2a2a2a; border:1px solid #333; border-radius:8px; color:white; font-size:14px; box-sizing:border-box;" />
+        </div>
+
+        <button @onclick="HandleLogin"
+                style="width:100%; padding:12px; background:#00c853; border:none; border-radius:8px; color:white; font-size:16px; font-weight:bold; cursor:pointer;">
+            Se connecter
+        </button>
+
+        <p style="color:#888; text-align:center; margin-top:20px; font-size:14px;">
+            Pas de compte? <a href="/register" style="color:#00c853;">Créer un compte</a>
+        </p>
+    </div>
+</div>
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string errorMessage = "";
+
+    private void HandleLogin()
+    {
+        
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        {
+            errorMessage = "Veuillez remplir tous les champs.";
+            return;
+        }
+
+        
+        Navigation.NavigateTo("/");
+    }
+}   
