@@ -1,4 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Buffers.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Stockify.Models
 {
@@ -7,18 +11,16 @@ namespace Stockify.Models
         private static ApiManagerSingleton instance;
 
         private const string apiKey = "nqSHuJEa1PCoJNT9cXXjWaJ1WOHK0QqD";
-        private string baseURL;
-        private bool isOnline;
-        private JsonConverter jsonConverter;
+        private const string baseUrl = "https://api.massive.com/v3/quotes/";
+        private string ticker = "AAPL";
+        private readonly HttpClient httpClient;
 
         private ApiManagerSingleton()
         {
+            httpClient = new HttpClient();
         }
 
         public string ApiKey { get => apiKey;}
-        public string BaseURL { get => baseURL; set => baseURL = value; }
-        public bool IsOnline { get => isOnline; set => isOnline = value; }
-        public JsonConverter JsonConverter { get => jsonConverter; set => jsonConverter = value; }
 
         public static ApiManagerSingleton getInstance()
         {
@@ -29,5 +31,30 @@ namespace Stockify.Models
                 return instance;
             
         }
+
+        public async Task<string> GetStockValueAsync(string ticker)
+        {
+            try
+            {
+                string requestUrl = $"{baseUrl}{ticker}?apiKey={ApiKey}";
+
+                var response = await httpClient.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+
+                return $"Error: {response.StatusCode}";
+            }
+            catch (Exception ex)
+            {
+                return $"Exception: {ex.Message}";
+            }
+        }
+
+
+
+
     }
 }
