@@ -13,5 +13,6 @@
         public decimal Total { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
         public string Status { get; set; } = "COMPLETED";
+
     }
 }
