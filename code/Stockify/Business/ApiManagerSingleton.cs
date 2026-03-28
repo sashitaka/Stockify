@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Stockify
+namespace Stockify.Models
 {
     public class ApiManagerSingleton
     {
