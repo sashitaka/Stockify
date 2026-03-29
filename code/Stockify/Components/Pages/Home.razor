@@ -1,88 +1,112 @@
 ﻿@page "/"
-@using Stockify.Models
-@using System.Text.Json
+@rendermode InteractiveServer
+@using Stockify.Business
 @inject IConfiguration Configuration
 @inject ApiManagerSingleton ApiManager
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Stockify</PageTitle>
 
-<div class="container mt-4">
-    <div class="card shadow-sm p-4">
-        <h3 class="mb-4 text-primary">Stock Market Search</h3>
-        
-        <div class="input-group mb-3">
-            @* Added 'onkeyup' to allow searching by pressing Enter *@
-            <input type="text"
-                   class="form-control"
-                   @bind="searchTicker"
-                   @bind:event="oninput"
-                   @onkeyup="@(e => e.Key == "Enter" ? SearchStock() : null)"
-                   placeholder="Enter Ticker (e.g. AAPL)" />
-            <button class="btn btn-primary" @onclick="SearchStock">
-                <i class="bi bi-search"></i> Search
-            </button>
+<div class="home-wrapper">
+    <div class="search-section">
+        <h2 class="search-title">Rechercher un titre</h2>
+        <div class="search-bar">
+            <input @bind="symbol" @bind:event="oninput"
+                   @onkeypress="HandleKeyPress"
+                   placeholder="Ex: AAPL, TSLA, MSFT..." />
+            <button @onclick="FetchStock">Rechercher</button>
         </div>
-
-        <hr />
-
-        @if (isLoading)
-        {
-            <div class="text-center my-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        }
-        else if (currentStock != null)
-        {
-            <div class="card border-primary mb-3">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">@currentStock.Ticker</h5>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">@currentStock.Name</h5>
-                    <p class="card-text">
-                        <span class="badge bg-secondary">@currentStock.PrimaryExchange</span>
-                        <span class="badge bg-info text-dark">@currentStock.Market</span>
-                    </p>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>Currency:</strong> @currentStock.CurrencyName.ToUpper()</li>
-                        <li class="list-group-item">
-                            <strong>Status:</strong>
-                            <span class="@(currentStock.Active ? "text-success" : "text-danger")">
-                                @(currentStock.Active ? "● Active" : "○ Inactive")
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        }
-        else if (hasSearched)
-        {
-            <div class="alert alert-warning">
-                No stock found for ticker "<strong>@searchTicker</strong>".
-            </div>
-        }
     </div>
+
+    @if (isLoading)
+    {
+        <p style="color:white;">Chargement...</p>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error-box">@errorMessage</div>
+    }
+    else if (stock != null)
+    {
+        <div class="stock-card">
+            <div class="stock-header">
+                <h2 class="stock-ticker">@stock.Ticker</h2>
+                <span class="stock-price">$@stock.C.ToString("F2")</span>
+            </div>
+            <div class="stock-change @(stock.C >= stock.O ? "positive" : "negative")">
+                @(stock.C >= stock.O ? "▲" : "▼")
+                @((stock.C - stock.O).ToString("F2"))
+                (@(((stock.C - stock.O) / stock.O * 100).ToString("F2"))%)
+            </div>
+            <div class="stock-details">
+                <div class="detail-item">
+                    <span class="detail-label">Ouverture</span>
+                    <span class="detail-value">$@stock.O.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Haut</span>
+                    <span class="detail-value">$@stock.H.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Bas</span>
+                    <span class="detail-value">$@stock.L.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Fermeture</span>
+                    <span class="detail-value">$@stock.C.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Volume</span>
+                    <span class="detail-value">@stock.V.ToString("N0")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Prix moyen</span>
+                    <span class="detail-value">$@stock.Vw.ToString("F2")</span>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
-    private string searchTicker = "";
-    private Stock? currentStock;
+    private string symbol = "";
+    private StockResult? stock;
     private bool isLoading = false;
-    private bool hasSearched = false;
+    private string? errorMessage;
 
-    private async Task SearchStock()
+    private async Task HandleKeyPress(KeyboardEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(searchTicker)) return;
+        if (e.Key == "Enter") await FetchStock();
+    }
+
+    private async Task FetchStock()
+    {
+        if (string.IsNullOrWhiteSpace(symbol))
+        {
+            errorMessage = "Veuillez entrer un symbole.";
+            return;
+        }
 
         isLoading = true;
-        hasSearched = true;
-        
-        // Reset previous result before fetching new one
-        currentStock = null;
-        
-        currentStock = await ApiManager.GetStockDetailsAsync(searchTicker);
-        isLoading = false;
+        stock = null;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var api = ApiManagerSingleton.getInstance(Configuration);
+            stock = await api.GetStockAsync(symbol);
+
+            if (stock == null)
+                errorMessage = $"Aucun résultat pour '{symbol}'.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 }
