@@ -1,53 +1,70 @@
-﻿using System.Buffers.Text;
+﻿using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Net.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Stockify.Models
 {
     public class ApiManagerSingleton
     {
+        private static ApiManagerSingleton? _instance;
+        private static readonly object _lockObj = new();
 
-        private const string apiKey = "dp5iFyne5UXzF3KhBbU2dr_ElfWcK1TO";
-        private const string baseUrl = "https://api.massive.com/v3/quotes/";
-        private readonly HttpClient httpClient;
+        private readonly string _apiKey;
+        private readonly string _baseUrl;
+        private readonly HttpClient _httpClient;
 
-        private ApiManagerSingleton()
+        private ApiManagerSingleton(IConfiguration configuration)
         {
-            httpClient = new HttpClient();
+            _apiKey = configuration["MassiveApi:ApiKey"] ?? "nqSHuJEa1PCoJNT9cXXjWaJ1WOHK0QqD";
+            _baseUrl = configuration["MassiveApi:BaseUrl"] ?? "https://api.massive.com";
+
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Accept.Clear();
+            _httpClient.DefaultRequestHeaders.Accept.Add(
+                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public string ApiKey { get => apiKey;}
-
-        private static readonly Lazy<ApiManagerSingleton> _lazy = new(() => new ApiManagerSingleton());
-
-        public static ApiManagerSingleton getInstance() => _lazy.Value;
+        public static ApiManagerSingleton getInstance(IConfiguration configuration)
+        {
+            if (_instance == null)
+            {
+                lock (_lockObj)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new ApiManagerSingleton(configuration);
+                    }
+                }
+            }
+            return _instance;
+        }
 
         public async Task<string> GetStockValueAsync(string ticker)
         {
             try
             {
-                string requestUrl = $"{baseUrl}{ticker}?apiKey={ApiKey}";
+                string url = $"{_baseUrl}/v3/quotes/{ticker}?apiKey={_apiKey}";
+                System.Diagnostics.Debug.WriteLine($"📡 API Request: {url}");
 
-                var response = await httpClient.GetAsync(requestUrl);
+                var response = await _httpClient.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
-                    throw new HttpRequestException(
-                        $"API returned {(int)response.StatusCode}: {response.ReasonPhrase}"
-                    );
+                {
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    System.Diagnostics.Debug.WriteLine($"❌ API Error: {response.StatusCode} - {errorBody}");
+                    throw new HttpRequestException($"{(int)response.StatusCode}: {response.ReasonPhrase}");
+                }
 
-                return await response.Content.ReadAsStringAsync();
+                var json = await response.Content.ReadAsStringAsync();
+                System.Diagnostics.Debug.WriteLine($"✅ API Response: {json}");
+                return json;
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"💥 Exception: {ex.Message}");
                 return $"Exception: {ex.Message}";
             }
         }
-
-
-
-
     }
 }

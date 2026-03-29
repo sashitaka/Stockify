@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Stockify.Models
 @using System.Text.Json
+@inject IConfiguration Configuration
 
 <PageTitle>Home</PageTitle>
 <div class="container">
@@ -11,9 +12,27 @@
         <button class="btn btn-primary" @onclick="FetchStock">Search</button>
     </div>
 
+    @if (debugMessage != null)
+    {
+        <div class="alert alert-info">@debugMessage</div>
+    }
+
     @if (isLoading)
     {
         <p><em>Loading data from Massive.com...</em></p>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Error:</strong> @errorMessage
+        </div>
+        @if (!string.IsNullOrEmpty(rawJsonResponse))
+        {
+            <details>
+                <summary>Raw API Response (Debug)</summary>
+                <pre>@rawJsonResponse</pre>
+            </details>
+        }
     }
     else if (currentStock != null)
     {
@@ -30,38 +49,83 @@
 
 @code {
     private string symbol = "";
-    private Stock? currentStock; // Added ? because it starts as null
+    private Stock? currentStock;
     private bool isLoading = false;
+    private string? errorMessage;
+    private string? rawJsonResponse;
+    private string? debugMessage;
 
-    private async Task FetchStock()
+    public async Task FetchStock()
     {
-        if (string.IsNullOrWhiteSpace(symbol)) return;
+        debugMessage = $"🔍 Searching for {symbol}...";
+        System.Diagnostics.Debug.WriteLine(debugMessage);
+
+        if (string.IsNullOrWhiteSpace(symbol))
+        {
+            debugMessage = "❌ Please enter a ticker symbol";
+            return;
+        }
 
         isLoading = true;
         currentStock = null;
+        errorMessage = null;
+        rawJsonResponse = null;
+        await Task.Delay(100); // Force UI update
+        StateHasChanged();
 
         try
         {
-            // 1. Get the Singleton instance
-            var apiManager = ApiManagerSingleton.getInstance();
+            debugMessage = "⏳ Calling API...";
+            System.Diagnostics.Debug.WriteLine(debugMessage);
+            StateHasChanged();
 
-            // 2. AWAIT the call to get the raw JSON string
-            string jsonResponse = await apiManager.GetStockValueAsync(symbol);
+            var apiManager = ApiManagerSingleton.getInstance(Configuration);
+            string jsonResponse = await apiManager.GetStockValueAsync(symbol.ToUpper());
 
-            // 3. Convert the JSON string into your 'Stock' object
-            // Note: PropertyNameCaseInsensitive helps if the API uses "value" instead of "Value"
-            currentStock = JsonSerializer.Deserialize<Stock>(jsonResponse,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            rawJsonResponse = jsonResponse;
+            System.Diagnostics.Debug.WriteLine($"Raw API Response: {jsonResponse}");
+
+            if (jsonResponse.StartsWith("Exception:") || string.IsNullOrEmpty(jsonResponse))
+            {
+                errorMessage = jsonResponse ?? "Empty response from API";
+                debugMessage = $"❌ API Error: {errorMessage}";
+                System.Diagnostics.Debug.WriteLine(debugMessage);
+                return;
+            }
+
+            try
+            {
+                currentStock = JsonSerializer.Deserialize<Stock>(jsonResponse,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (currentStock == null)
+                {
+                    errorMessage = $"Unable to parse stock data. Response: {jsonResponse.Substring(0, Math.Min(200, jsonResponse.Length))}";
+                    debugMessage = $"❌ Parse Error: {errorMessage}";
+                    System.Diagnostics.Debug.WriteLine(debugMessage);
+                }
+                else
+                {
+                    debugMessage = $"✅ Success! {currentStock.Nom} @ ${currentStock.Value}";
+                    System.Diagnostics.Debug.WriteLine(debugMessage);
+                }
+            }
+            catch (JsonException jex)
+            {
+                errorMessage = $"JSON Parse Error: {jex.Message}";
+                debugMessage = $"❌ JSON Error: {errorMessage}";
+                System.Diagnostics.Debug.WriteLine(debugMessage);
+            }
         }
         catch (Exception ex)
         {
-            // If the ticker is wrong or the API is down, we handle it here
-            Console.WriteLine($"Error fetching stock: {ex.Message}");
+            errorMessage = $"Error: {ex.Message}";
+            debugMessage = $"💥 Exception: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine(debugMessage);
         }
         finally
         {
             isLoading = false;
-            // StateHasChanged tells Blazor to refresh the UI immediately
             StateHasChanged();
         }
     }
