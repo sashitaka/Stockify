@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @inject NavigationManager Navigation
+@using Data
 
 <div class="auth-wrapper">
     <div class="auth-card">
@@ -34,13 +35,24 @@
     private string password = "";
     private string errorMessage = "";
 
-    private void HandleLogin()
+    private async Task HandleLogin()
     {
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             errorMessage = "Veuillez remplir tous les champs.";
             return;
         }
-        Navigation.NavigateTo("/");
+
+        var db = new DatabaseHelper();
+        bool isValidUser = await db.Login(email, password);
+        if (isValidUser)
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = "Email ou mot de passe incorrect.";
+        }
+
     }
 }

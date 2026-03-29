@@ -1,10 +1,10 @@
-﻿namespace Stockify.Models
+﻿namespace Stockify.Business
 {
     public class Transaction
     {
         private string date;
         private float montant;
-        private string type; //buy,sell
+        private string type;
         private string userID;
         private string stock;
 
