@@ -2,132 +2,87 @@
 @using Stockify.Models
 @using System.Text.Json
 @inject IConfiguration Configuration
+@inject ApiManagerSingleton ApiManager
 
 <PageTitle>Home</PageTitle>
-<div class="container">
-    <h3>Stock Market Search</h3>
 
-    <div class="input-group mb-3">
-        <input @bind="symbol" class="form-control" placeholder="Enter Ticker (e.g. AAPL)" />
-        <button class="btn btn-primary" @onclick="FetchStock">Search</button>
-    </div>
-
-    @if (debugMessage != null)
-    {
-        <div class="alert alert-info">@debugMessage</div>
-    }
-
-    @if (isLoading)
-    {
-        <p><em>Loading data from Massive.com...</em></p>
-    }
-    else if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="alert alert-danger" role="alert">
-            <strong>Error:</strong> @errorMessage
+<div class="container mt-4">
+    <div class="card shadow-sm p-4">
+        <h3 class="mb-4 text-primary">Stock Market Search</h3>
+        
+        <div class="input-group mb-3">
+            @* Added 'onkeyup' to allow searching by pressing Enter *@
+            <input type="text"
+                   class="form-control"
+                   @bind="searchTicker"
+                   @bind:event="oninput"
+                   @onkeyup="@(e => e.Key == "Enter" ? SearchStock() : null)"
+                   placeholder="Enter Ticker (e.g. AAPL)" />
+            <button class="btn btn-primary" @onclick="SearchStock">
+                <i class="bi bi-search"></i> Search
+            </button>
         </div>
-        @if (!string.IsNullOrEmpty(rawJsonResponse))
+
+        <hr />
+
+        @if (isLoading)
         {
-            <details>
-                <summary>Raw API Response (Debug)</summary>
-                <pre>@rawJsonResponse</pre>
-            </details>
-        }
-    }
-    else if (currentStock != null)
-    {
-        <div class="card mt-3" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title text-uppercase">@currentStock.Nom</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Real-time Price</h6>
-                <p class="card-text fs-2 fw-bold">@currentStock.Value.ToString("C")</p>
-
+            <div class="text-center my-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
-        </div>
-    }
+        }
+        else if (currentStock != null)
+        {
+            <div class="card border-primary mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">@currentStock.Ticker</h5>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@currentStock.Name</h5>
+                    <p class="card-text">
+                        <span class="badge bg-secondary">@currentStock.PrimaryExchange</span>
+                        <span class="badge bg-info text-dark">@currentStock.Market</span>
+                    </p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Currency:</strong> @currentStock.CurrencyName.ToUpper()</li>
+                        <li class="list-group-item">
+                            <strong>Status:</strong>
+                            <span class="@(currentStock.Active ? "text-success" : "text-danger")">
+                                @(currentStock.Active ? "● Active" : "○ Inactive")
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        }
+        else if (hasSearched)
+        {
+            <div class="alert alert-warning">
+                No stock found for ticker "<strong>@searchTicker</strong>".
+            </div>
+        }
+    </div>
 </div>
 
 @code {
-    private string symbol = "";
+    private string searchTicker = "";
     private Stock? currentStock;
     private bool isLoading = false;
-    private string? errorMessage;
-    private string? rawJsonResponse;
-    private string? debugMessage;
+    private bool hasSearched = false;
 
-    public async Task FetchStock()
+    private async Task SearchStock()
     {
-        debugMessage = $"🔍 Searching for {symbol}...";
-        System.Diagnostics.Debug.WriteLine(debugMessage);
-
-        if (string.IsNullOrWhiteSpace(symbol))
-        {
-            debugMessage = "❌ Please enter a ticker symbol";
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(searchTicker)) return;
 
         isLoading = true;
+        hasSearched = true;
+        
+        // Reset previous result before fetching new one
         currentStock = null;
-        errorMessage = null;
-        rawJsonResponse = null;
-        await Task.Delay(100); // Force UI update
-        StateHasChanged();
-
-        try
-        {
-            debugMessage = "⏳ Calling API...";
-            System.Diagnostics.Debug.WriteLine(debugMessage);
-            StateHasChanged();
-
-            var apiManager = ApiManagerSingleton.getInstance(Configuration);
-            string jsonResponse = await apiManager.GetStockValueAsync(symbol.ToUpper());
-
-            rawJsonResponse = jsonResponse;
-            System.Diagnostics.Debug.WriteLine($"Raw API Response: {jsonResponse}");
-
-            if (jsonResponse.StartsWith("Exception:") || string.IsNullOrEmpty(jsonResponse))
-            {
-                errorMessage = jsonResponse ?? "Empty response from API";
-                debugMessage = $"❌ API Error: {errorMessage}";
-                System.Diagnostics.Debug.WriteLine(debugMessage);
-                return;
-            }
-
-            try
-            {
-                currentStock = JsonSerializer.Deserialize<Stock>(jsonResponse,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (currentStock == null)
-                {
-                    errorMessage = $"Unable to parse stock data. Response: {jsonResponse.Substring(0, Math.Min(200, jsonResponse.Length))}";
-                    debugMessage = $"❌ Parse Error: {errorMessage}";
-                    System.Diagnostics.Debug.WriteLine(debugMessage);
-                }
-                else
-                {
-                    debugMessage = $"✅ Success! {currentStock.Nom} @ ${currentStock.Value}";
-                    System.Diagnostics.Debug.WriteLine(debugMessage);
-                }
-            }
-            catch (JsonException jex)
-            {
-                errorMessage = $"JSON Parse Error: {jex.Message}";
-                debugMessage = $"❌ JSON Error: {errorMessage}";
-                System.Diagnostics.Debug.WriteLine(debugMessage);
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error: {ex.Message}";
-            debugMessage = $"💥 Exception: {ex.Message}";
-            System.Diagnostics.Debug.WriteLine(debugMessage);
-        }
-        finally
-        {
-            isLoading = false;
-            StateHasChanged();
-        }
+        
+        currentStock = await ApiManager.GetStockDetailsAsync(searchTicker);
+        isLoading = false;
     }
 }
- 

@@ -1,69 +1,44 @@
-﻿using System.Net.Http;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.Configuration;
+﻿using System.Net.Http.Json;
+using Stockify.Models;
 
 namespace Stockify.Models
 {
     public class ApiManagerSingleton
     {
-        private static ApiManagerSingleton? _instance;
-        private static readonly object _lockObj = new();
-
-        private readonly string _apiKey;
-        private readonly string _baseUrl;
         private readonly HttpClient _httpClient;
 
-        private ApiManagerSingleton(IConfiguration configuration)
-        {
-            _apiKey = configuration["MassiveApi:ApiKey"] ?? "nqSHuJEa1PCoJNT9cXXjWaJ1WOHK0QqD";
-            _baseUrl = configuration["MassiveApi:BaseUrl"] ?? "https://api.massive.com";
+        // It's best practice to keep the base URL and API Key separate
+        private const string BaseUrl = "https://api.massive.com/v3/reference/tickers";
+        private const string ApiKey = "dp5iFyne5UXzF3KhBbU2dr_ElfWcK1TO";
 
-            _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+        public ApiManagerSingleton(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
         }
 
-        public static ApiManagerSingleton getInstance(IConfiguration configuration)
+        public async Task<Stock?> GetStockDetailsAsync(string ticker)
         {
-            if (_instance == null)
-            {
-                lock (_lockObj)
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new ApiManagerSingleton(configuration);
-                    }
-                }
-            }
-            return _instance;
-        }
+            if (string.IsNullOrWhiteSpace(ticker)) return null;
 
-        public async Task<string> GetStockValueAsync(string ticker)
-        {
             try
             {
-                string url = $"{_baseUrl}/v3/quotes/{ticker}?apiKey={_apiKey}";
-                System.Diagnostics.Debug.WriteLine($"📡 API Request: {url}");
+                // Use the ticker parameter and ensure it's uppercase for the API
+                var url = $"{BaseUrl}/{ticker.ToUpper()}?apiKey={ApiKey}";
 
-                var response = await _httpClient.GetAsync(url);
+                var response = await _httpClient.GetFromJsonAsync<MassiveResponse>(url);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorBody = await response.Content.ReadAsStringAsync();
-                    System.Diagnostics.Debug.WriteLine($"❌ API Error: {response.StatusCode} - {errorBody}");
-                    throw new HttpRequestException($"{(int)response.StatusCode}: {response.ReasonPhrase}");
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine($"✅ API Response: {json}");
-                return json;
+                return response?.Results;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                // This will catch 404s (stock not found) or connection issues
+                Console.WriteLine($"HTTP Error: {httpEx.Message}");
+                return null;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"💥 Exception: {ex.Message}");
-                return $"Exception: {ex.Message}";
+                Console.WriteLine($"General Error: {ex.Message}");
+                return null;
             }
         }
     }
