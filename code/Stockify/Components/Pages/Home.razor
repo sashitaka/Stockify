@@ -1,10 +1,62 @@
 ﻿@page "/"
 
 <PageTitle>Home</PageTitle>
+<div class="container">
+    <h3>Stock Market Search</h3>
 
-<h1>Hello, world!</h1>
+    <div class="input-group mb-3">
+        <input @bind="symbol" class="form-control" placeholder="Enter Ticker (e.g. AAPL)" />
+        <button class="btn btn-primary" @onclick="FetchStock">Search</button>
+    </div>
 
-<div >
-    hello
+    @if (isLoading)
+    {
+        <p><em>Loading data from Massive.com...</em></p>
+    }
+    else if (currentStock != null)
+    {
+        <div class="card mt-3" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title text-uppercase">@currentStock.Ticker</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Real-time Price</h6>
+                <p class="card-text fs-2 fw-bold">@currentStock.Price.ToString("C")</p>
+                <p class="card-text @(currentStock.Change >= 0 ? "text-success" : "text-danger")">
+                    Change: @currentStock.Change.ToString("P")
+                </p>
+            </div>
+        </div>
+    }
 </div>
+
+@code {
+    private string symbol = "";
+    private StockData? currentStock;
+    private bool isLoading = false;
+
+    private async Task FetchStock()
+    {
+        if (string.IsNullOrWhiteSpace(symbol)) return;
+
+        isLoading = true;
+        currentStock = null;
+
+        // Use your Singleton to get the raw JSON
+        var jsonResponse = await ApiManagerSingleton.GetInstance().GetStockValueAsync(symbol);
+
+        try
+        {
+            // Turn the JSON string into our C# StockData object
+            currentStock = JsonSerializer.Deserialize<StockData>(jsonResponse,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+        catch (Exception)
+        {
+            // Handle parsing errors (e.g. if the ticker doesn't exist)
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
  
