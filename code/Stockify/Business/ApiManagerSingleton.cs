@@ -11,7 +11,7 @@ namespace Stockify.Models
     {
         private static ApiManagerSingleton instance;
 
-        private const string apiKey = "nqSHuJEa1PCoJNT9cXXjWaJ1WOHK0QqD";
+        private const string apiKey = "dp5iFyne5UXzF3KhBbU2dr_ElfWcK1TO";
         private const string baseUrl = "https://api.massive.com/v3/quotes/";
         private readonly HttpClient httpClient;
 
