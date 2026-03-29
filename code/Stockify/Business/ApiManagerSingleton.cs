@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace Stockify.Models
 {
@@ -12,7 +13,6 @@ namespace Stockify.Models
 
         private const string apiKey = "nqSHuJEa1PCoJNT9cXXjWaJ1WOHK0QqD";
         private const string baseUrl = "https://api.massive.com/v3/quotes/";
-        private string ticker = "AAPL";
         private readonly HttpClient httpClient;
 
         private ApiManagerSingleton()

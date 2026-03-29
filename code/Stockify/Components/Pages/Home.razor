@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Stockify.Models
+@using System.Text.Json
 
 <PageTitle>Home</PageTitle>
 <div class="container">
@@ -17,12 +19,10 @@
     {
         <div class="card mt-3" style="width: 18rem;">
             <div class="card-body">
-                <h5 class="card-title text-uppercase">@currentStock.Ticker</h5>
+                <h5 class="card-title text-uppercase">@currentStock.Nom</h5>
                 <h6 class="card-subtitle mb-2 text-muted">Real-time Price</h6>
-                <p class="card-text fs-2 fw-bold">@currentStock.Price.ToString("C")</p>
-                <p class="card-text @(currentStock.Change >= 0 ? "text-success" : "text-danger")">
-                    Change: @currentStock.Change.ToString("P")
-                </p>
+                <p class="card-text fs-2 fw-bold">@currentStock.Value.ToString("C")</p>
+
             </div>
         </div>
     }
@@ -30,7 +30,7 @@
 
 @code {
     private string symbol = "";
-    private StockData? currentStock;
+    private Stock? currentStock; // Added ? because it starts as null
     private bool isLoading = false;
 
     private async Task FetchStock()
@@ -40,22 +40,29 @@
         isLoading = true;
         currentStock = null;
 
-        // Use your Singleton to get the raw JSON
-        var jsonResponse = await ApiManagerSingleton.GetInstance().GetStockValueAsync(symbol);
-
         try
         {
-            // Turn the JSON string into our C# StockData object
-            currentStock = JsonSerializer.Deserialize<StockData>(jsonResponse,
+            // 1. Get the Singleton instance
+            var apiManager = ApiManagerSingleton.getInstance();
+
+            // 2. AWAIT the call to get the raw JSON string
+            string jsonResponse = await apiManager.GetStockValueAsync(symbol);
+
+            // 3. Convert the JSON string into your 'Stock' object
+            // Note: PropertyNameCaseInsensitive helps if the API uses "value" instead of "Value"
+            currentStock = JsonSerializer.Deserialize<Stock>(jsonResponse,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Handle parsing errors (e.g. if the ticker doesn't exist)
+            // If the ticker is wrong or the API is down, we handle it here
+            Console.WriteLine($"Error fetching stock: {ex.Message}");
         }
         finally
         {
             isLoading = false;
+            // StateHasChanged tells Blazor to refresh the UI immediately
+            StateHasChanged();
         }
     }
 }
