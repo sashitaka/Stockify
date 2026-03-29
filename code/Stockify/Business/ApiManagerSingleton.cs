@@ -9,7 +9,6 @@ namespace Stockify.Models
 {
     public class ApiManagerSingleton
     {
-        private static ApiManagerSingleton instance;
 
         private const string apiKey = "dp5iFyne5UXzF3KhBbU2dr_ElfWcK1TO";
         private const string baseUrl = "https://api.massive.com/v3/quotes/";
@@ -22,15 +21,9 @@ namespace Stockify.Models
 
         public string ApiKey { get => apiKey;}
 
-        public static ApiManagerSingleton getInstance()
-        {
-            if (instance == null)
-            {
-                instance = new ApiManagerSingleton();
-            }
-                return instance;
-            
-        }
+        private static readonly Lazy<ApiManagerSingleton> _lazy = new(() => new ApiManagerSingleton());
+
+        public static ApiManagerSingleton getInstance() => _lazy.Value;
 
         public async Task<string> GetStockValueAsync(string ticker)
         {
@@ -40,12 +33,12 @@ namespace Stockify.Models
 
                 var response = await httpClient.GetAsync(requestUrl);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync();
-                }
+                if (!response.IsSuccessStatusCode)
+                    throw new HttpRequestException(
+                        $"API returned {(int)response.StatusCode}: {response.ReasonPhrase}"
+                    );
 
-                return $"Error: {response.StatusCode}";
+                return await response.Content.ReadAsStringAsync();
             }
             catch (Exception ex)
             {

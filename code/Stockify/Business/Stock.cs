@@ -1,11 +1,15 @@
-﻿namespace Stockify.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Stockify.Models
 {
     public class Stock
     {
-        private string nom;
-        private float currentValue;
+        // Maps the API's "symbol" or "ticker" to your "Nom"
+        [JsonPropertyName("ticker")]
+        public string Nom { get; set; } = string.Empty;
 
-        public string Nom { get => nom; set => nom = value; }
-        public float Value { get => currentValue; set => currentValue = value; }
+        // Maps the API's "price" or "value" to your "Value"
+        [JsonPropertyName("price")]
+        public decimal Value { get; set; }
     }
 }
