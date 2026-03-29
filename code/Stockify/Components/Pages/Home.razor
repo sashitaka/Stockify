@@ -1,47 +1,66 @@
 ﻿@page "/"
-@using Stockify.Models
-@using System.Text.Json
+@rendermode InteractiveServer
+@using Stockify.Business
 @inject IConfiguration Configuration
 
-<PageTitle>Home</PageTitle>
-<div class="container">
-    <h3>Stock Market Search</h3>
+<PageTitle>Stockify</PageTitle>
 
-    <div class="input-group mb-3">
-        <input @bind="symbol" class="form-control" placeholder="Enter Ticker (e.g. AAPL)" />
-        <button class="btn btn-primary" @onclick="FetchStock">Search</button>
+<div class="home-wrapper">
+    <div class="search-section">
+        <h2 class="search-title">Rechercher un titre</h2>
+        <div class="search-bar">
+            <input @bind="symbol" @bind:event="oninput"
+                   @onkeypress="HandleKeyPress"
+                   placeholder="Ex: AAPL, TSLA, MSFT..." />
+            <button @onclick="FetchStock">Rechercher</button>
+        </div>
     </div>
-
-    @if (debugMessage != null)
-    {
-        <div class="alert alert-info">@debugMessage</div>
-    }
 
     @if (isLoading)
     {
-        <p><em>Loading data from Massive.com...</em></p>
+        <p style="color:white;">Chargement...</p>
     }
     else if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="alert alert-danger" role="alert">
-            <strong>Error:</strong> @errorMessage
-        </div>
-        @if (!string.IsNullOrEmpty(rawJsonResponse))
-        {
-            <details>
-                <summary>Raw API Response (Debug)</summary>
-                <pre>@rawJsonResponse</pre>
-            </details>
-        }
+        <div class="error-box">@errorMessage</div>
     }
-    else if (currentStock != null)
+    else if (stock != null)
     {
-        <div class="card mt-3" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title text-uppercase">@currentStock.Nom</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Real-time Price</h6>
-                <p class="card-text fs-2 fw-bold">@currentStock.Value.ToString("C")</p>
-
+        <div class="stock-card">
+            <div class="stock-header">
+                <h2 class="stock-ticker">@stock.Ticker</h2>
+                <span class="stock-price">$@stock.C.ToString("F2")</span>
+            </div>
+            <div class="stock-change @(stock.C >= stock.O ? "positive" : "negative")">
+                @(stock.C >= stock.O ? "▲" : "▼")
+                @((stock.C - stock.O).ToString("F2"))
+                (@(((stock.C - stock.O) / stock.O * 100).ToString("F2"))%)
+            </div>
+            <div class="stock-details">
+                <div class="detail-item">
+                    <span class="detail-label">Ouverture</span>
+                    <span class="detail-value">$@stock.O.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Haut</span>
+                    <span class="detail-value">$@stock.H.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Bas</span>
+                    <span class="detail-value">$@stock.L.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Fermeture</span>
+                    <span class="detail-value">$@stock.C.ToString("F2")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Volume</span>
+                    <span class="detail-value">@stock.V.ToString("N0")</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Prix moyen</span>
+                    <span class="detail-value">$@stock.Vw.ToString("F2")</span>
+                </div>
             </div>
         </div>
     }
@@ -49,79 +68,39 @@
 
 @code {
     private string symbol = "";
-    private Stock? currentStock;
+    private StockResult? stock;
     private bool isLoading = false;
     private string? errorMessage;
-    private string? rawJsonResponse;
-    private string? debugMessage;
 
-    public async Task FetchStock()
+    private async Task HandleKeyPress(KeyboardEventArgs e)
     {
-        debugMessage = $"🔍 Searching for {symbol}...";
-        System.Diagnostics.Debug.WriteLine(debugMessage);
+        if (e.Key == "Enter") await FetchStock();
+    }
 
+    private async Task FetchStock()
+    {
         if (string.IsNullOrWhiteSpace(symbol))
         {
-            debugMessage = "❌ Please enter a ticker symbol";
+            errorMessage = "Veuillez entrer un symbole.";
             return;
         }
 
         isLoading = true;
-        currentStock = null;
+        stock = null;
         errorMessage = null;
-        rawJsonResponse = null;
-        await Task.Delay(100); // Force UI update
         StateHasChanged();
 
         try
         {
-            debugMessage = "⏳ Calling API...";
-            System.Diagnostics.Debug.WriteLine(debugMessage);
-            StateHasChanged();
+            var api = ApiManagerSingleton.getInstance(Configuration);
+            stock = await api.GetStockAsync(symbol);
 
-            var apiManager = ApiManagerSingleton.getInstance(Configuration);
-            string jsonResponse = await apiManager.GetStockValueAsync(symbol.ToUpper());
-
-            rawJsonResponse = jsonResponse;
-            System.Diagnostics.Debug.WriteLine($"Raw API Response: {jsonResponse}");
-
-            if (jsonResponse.StartsWith("Exception:") || string.IsNullOrEmpty(jsonResponse))
-            {
-                errorMessage = jsonResponse ?? "Empty response from API";
-                debugMessage = $"❌ API Error: {errorMessage}";
-                System.Diagnostics.Debug.WriteLine(debugMessage);
-                return;
-            }
-
-            try
-            {
-                currentStock = JsonSerializer.Deserialize<Stock>(jsonResponse,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (currentStock == null)
-                {
-                    errorMessage = $"Unable to parse stock data. Response: {jsonResponse.Substring(0, Math.Min(200, jsonResponse.Length))}";
-                    debugMessage = $"❌ Parse Error: {errorMessage}";
-                    System.Diagnostics.Debug.WriteLine(debugMessage);
-                }
-                else
-                {
-                    debugMessage = $"✅ Success! {currentStock.Nom} @ ${currentStock.Value}";
-                    System.Diagnostics.Debug.WriteLine(debugMessage);
-                }
-            }
-            catch (JsonException jex)
-            {
-                errorMessage = $"JSON Parse Error: {jex.Message}";
-                debugMessage = $"❌ JSON Error: {errorMessage}";
-                System.Diagnostics.Debug.WriteLine(debugMessage);
-            }
+            if (stock == null)
+                errorMessage = $"Aucun résultat pour '{symbol}'.";
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error: {ex.Message}";
-            debugMessage = $"💥 Exception: {ex.Message}";
-            System.Diagnostics.Debug.WriteLine(debugMessage);
+            errorMessage = $"Erreur: {ex.Message}";
         }
         finally
         {
@@ -130,4 +109,3 @@
         }
     }
 }
- 

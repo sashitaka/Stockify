@@ -1,9 +1,8 @@
-﻿using System.Net.Http;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 
-namespace Stockify.Models
+namespace Stockify.Business
 {
     public class ApiManagerSingleton
     {
@@ -11,18 +10,12 @@ namespace Stockify.Models
         private static readonly object _lockObj = new();
 
         private readonly string _apiKey;
-        private readonly string _baseUrl;
         private readonly HttpClient _httpClient;
 
         private ApiManagerSingleton(IConfiguration configuration)
         {
-            _apiKey = configuration["MassiveApi:ApiKey"] ?? "nqSHuJEa1PCoJNT9cXXjWaJ1WOHK0QqD";
-            _baseUrl = configuration["MassiveApi:BaseUrl"] ?? "https://api.massive.com";
-
+            _apiKey = configuration["MassiveApi:ApiKey"] ?? "";
             _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.Accept.Clear();
-            _httpClient.DefaultRequestHeaders.Accept.Add(
-                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public static ApiManagerSingleton getInstance(IConfiguration configuration)
@@ -31,40 +24,72 @@ namespace Stockify.Models
             {
                 lock (_lockObj)
                 {
-                    if (_instance == null)
-                    {
-                        _instance = new ApiManagerSingleton(configuration);
-                    }
+                    _instance ??= new ApiManagerSingleton(configuration);
                 }
             }
             return _instance;
         }
 
-        public async Task<string> GetStockValueAsync(string ticker)
+        public async Task<StockResult?> GetStockAsync(string ticker)
         {
             try
             {
-                string url = $"{_baseUrl}/v3/quotes/{ticker}?apiKey={_apiKey}";
-                System.Diagnostics.Debug.WriteLine($"📡 API Request: {url}");
+                string url = $"https://api.massive.com/v2/aggs/ticker/{ticker.ToUpper().Trim()}/prev?apiKey={_apiKey}";
+                Console.WriteLine($"URL: {url}");
 
                 var response = await _httpClient.GetAsync(url);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorBody = await response.Content.ReadAsStringAsync();
-                    System.Diagnostics.Debug.WriteLine($"❌ API Error: {response.StatusCode} - {errorBody}");
-                    throw new HttpRequestException($"{(int)response.StatusCode}: {response.ReasonPhrase}");
-                }
-
                 var json = await response.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine($"✅ API Response: {json}");
-                return json;
+                Console.WriteLine($"JSON: {json}");
+
+                if (!response.IsSuccessStatusCode) return null;
+
+                var result = JsonSerializer.Deserialize<MassiveAggsResponse>(json);
+                return result?.Results?.FirstOrDefault();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"💥 Exception: {ex.Message}");
-                return $"Exception: {ex.Message}";
+                Console.WriteLine($"Exception: {ex.Message}");
+                return null;
             }
         }
+    }
+
+    public class MassiveAggsResponse
+    {
+        [JsonPropertyName("ticker")]
+        public string? Ticker { get; set; }
+
+        [JsonPropertyName("status")]
+        public string? Status { get; set; }
+
+        [JsonPropertyName("results")]
+        public List<StockResult>? Results { get; set; }
+    }
+
+    public class StockResult
+    {
+        [JsonPropertyName("T")]
+        public string? Ticker { get; set; }
+
+        [JsonPropertyName("o")]
+        public double O { get; set; }
+
+        [JsonPropertyName("c")]
+        public double C { get; set; }
+
+        [JsonPropertyName("h")]
+        public double H { get; set; }
+
+        [JsonPropertyName("l")]
+        public double L { get; set; }
+
+        [JsonPropertyName("v")]
+        public double V { get; set; }
+
+        [JsonPropertyName("vw")]
+        public double Vw { get; set; }
+
+        [JsonPropertyName("t")]
+        public long Timestamp { get; set; }
     }
 }

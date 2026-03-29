@@ -168,3 +168,122 @@ a {
     font-size: 12px;
     margin-top: 4px;
 }
+
+/* ===== HOME ===== */
+.home-wrapper {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.search-title {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+    .search-bar input {
+        flex: 1;
+        padding: 12px 16px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        outline: none;
+    }
+
+        .search-bar input:focus {
+            border-color: #00c853;
+        }
+
+    .search-bar button {
+        padding: 12px 24px;
+        background: #00c853;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .search-bar button:hover {
+            background: #00a846;
+        }
+
+.loading {
+    color: #888;
+    text-align: center;
+    padding: 40px;
+}
+
+.stock-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.stock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.stock-ticker {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.stock-price {
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.stock-change {
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+    .stock-change.positive {
+        color: #00c853;
+    }
+
+    .stock-change.negative {
+        color: #ff4444;
+    }
+
+.stock-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.detail-item {
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.detail-label {
+    color: #888;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
