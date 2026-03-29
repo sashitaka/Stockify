@@ -1,4 +1,4 @@
-﻿namespace Stockify.Models
+﻿namespace Stockify.Business
 {
     public class PortfolioItem : Stock
     {

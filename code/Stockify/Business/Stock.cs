@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Stockify.Models
+namespace Stockify.Business
 {
     public class Stock
     {
