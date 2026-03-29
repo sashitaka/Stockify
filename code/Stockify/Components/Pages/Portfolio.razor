@@ -1,0 +1,242 @@
+@page "/portfolio"
+@using Stockify.Data
+@using Stockify.Business
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inject DatabaseHelper DatabaseHelper
+@inject ApiManagerSingleton ApiManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Portfolio - Stockify</PageTitle>
+
+<div class="portfolio-wrapper">
+    <div class="portfolio-header">
+        <h1>Mon Portfolio</h1>
+        <p class="portfolio-subtitle">Gérez vos investissements en bourse</p>
+    </div>
+
+    <div class="portfolio-content">
+        @if (isLoading)
+        {
+            <p>Chargement du portfolio...</p>
+        }
+        else if (portfolioItems == null || portfolioItems.Count == 0)
+        {
+            <p>Aucun stock dans votre portfolio.</p>
+        }
+        else
+        {
+            <table class="portfolio-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Nom de la compagnie</th>
+                        <th>Quantité</th>
+                        <th>Prix moyen d'achat</th>
+                        <th>Valeur actuelle</th>
+                        <th>Valeur totale</th>
+                        <th>Profit/Déficit %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="portfolio-total">
+                        <td colspan="5"><strong>Total</strong></td>
+                        <td><strong>@totalValue.ToString("C")</strong></td>
+                        <td><strong>@globalPercentage.ToString("F2")%</strong></td>
+                    </tr>
+                    @foreach (var item in portfolioItems)
+                    {
+                        decimal itemValue = (decimal)item.QuantityOwned * item.CurrentPrice;
+                        decimal averageCost = item.QuantityOwned > 0 ? (decimal)item.OwnedValue / (decimal)item.QuantityOwned : 0;
+                        decimal profit = itemValue - (decimal)item.OwnedValue;
+                        decimal profitPercentage = item.OwnedValue > 0 ? (profit / (decimal)item.OwnedValue) * 100 : 0;
+                        string rowClass = profitPercentage >= 0 ? "profit" : "deficit";
+
+                        <tr class="portfolio-stock @rowClass">
+                            <td><strong>@item.Ticker</strong></td>
+                            <td>@item.Name</td>
+                            <td>@item.QuantityOwned.ToString("F2")</td>
+                            <td>@averageCost.ToString("C")</td>
+                            <td>@item.CurrentPrice.ToString("C")</td>
+                            <td>@itemValue.ToString("C")</td>
+                            <td class="@(profitPercentage >= 0 ? "text-success" : "text-danger")">
+                                @profitPercentage.ToString("F2")%
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private List<PortfolioItem> portfolioItems = new();
+    private bool isLoading = true;
+    private decimal totalValue = 0;
+    private decimal globalPercentage = 0;
+    private string userId = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+            await LoadPortfolio();
+        }
+
+        isLoading = false;
+    }
+
+    private async Task LoadPortfolio()
+    {
+        try
+        {
+            using (var connection = DatabaseHelper.GetConnection())
+            {
+                await connection.OpenAsync();
+
+                // Récupérer les stocks du portfolio de l'utilisateur
+                var query = @"
+                    SELECT 
+                        s.ticker,
+                        s.name,
+                        s.market,
+                        s.locale,
+                        s.primary_exchange,
+                        s.type,
+                        s.active,
+                        s.currency_name,
+                        SUM(CASE WHEN t.type = 'buy' THEN t.montant ELSE -t.montant END) as owned_value,
+                        SUM(CASE WHEN t.type = 'buy' THEN 1 ELSE -1 END * (t.montant / (SELECT AVG(c.close) FROM dbo.StockClose c WHERE c.ticker = s.ticker))) as quantity_owned
+                    FROM dbo.Stock s
+                    JOIN dbo.Transaction t ON s.ticker = t.stock
+                    JOIN dbo.User u ON u.id = t.userID
+                    WHERE u.id = @userId
+                    GROUP BY s.ticker, s.name, s.market, s.locale, s.primary_exchange, s.type, s.active, s.currency_name
+                    HAVING SUM(CASE WHEN t.type = 'buy' THEN 1 ELSE -1 END * (t.montant / (SELECT AVG(c.close) FROM dbo.StockClose c WHERE c.ticker = s.ticker))) > 0";
+
+                using (var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@userId", userId);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var portfolioItem = new PortfolioItem
+                            {
+                                Ticker = reader["ticker"].ToString() ?? "",
+                                Name = reader["name"].ToString() ?? "",
+                                Market = reader["market"].ToString() ?? "",
+                                Locale = reader["locale"].ToString() ?? "",
+                                PrimaryExchange = reader["primary_exchange"].ToString() ?? "",
+                                Type = reader["type"].ToString() ?? "",
+                                Active = (bool)reader["active"],
+                                CurrencyName = reader["currency_name"].ToString() ?? "USD",
+                                OwnedValue = Convert.ToSingle(reader["owned_value"]),
+                                QuantityOwned = Convert.ToSingle(reader["quantity_owned"])
+                            };
+
+                            // Récupérer le prix actuel via l'API
+                            var stockResult = await ApiManager.GetStockAsync(portfolioItem.Ticker);
+                            portfolioItem.CurrentPrice = (decimal)(stockResult?.C ?? 0);
+
+                            portfolioItems.Add(portfolioItem);
+
+                            // Calculer le total
+                            totalValue += (decimal)portfolioItem.QuantityOwned * portfolioItem.CurrentPrice;
+                        }
+                    }
+                }
+
+                // Calculer le pourcentage de profit/déficit global
+                decimal totalInvested = (decimal)portfolioItems.Sum(p => p.OwnedValue);
+                if (totalInvested > 0)
+                {
+                    globalPercentage = ((totalValue - totalInvested) / totalInvested) * 100;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors du chargement du portfolio: {ex.Message}");
+        }
+    }
+}
+
+<style>
+    .portfolio-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .portfolio-header {
+        margin-bottom: 30px;
+    }
+
+    .portfolio-header h1 {
+        margin: 0;
+        color: #333;
+    }
+
+    .portfolio-subtitle {
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .portfolio-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .portfolio-table thead {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .portfolio-table th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .portfolio-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .portfolio-table tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .portfolio-total {
+        background-color: #f0f0f0;
+        font-weight: bold;
+    }
+
+    .portfolio-stock.profit {
+        background-color: #e8f5e9;
+    }
+
+    .portfolio-stock.deficit {
+        background-color: #ffebee;
+    }
+
+    .text-success {
+        color: #28a745;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+</style>
+
