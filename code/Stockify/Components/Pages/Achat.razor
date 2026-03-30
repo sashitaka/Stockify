@@ -1,6 +1,8 @@
 ﻿@page "/achat/{Symbol}"
 @inject NavigationManager Navigation
+@inject IConfiguration Configuration
 @using Stockify.Data
+@using Stockify.Business
 
 <div class="home-wrapper">
     <div class="stock-card">
@@ -61,6 +63,25 @@
     private bool isBuyingByAmount = true;
     private bool isProcessing = false;
     private string errorMessage = "";
+    private bool isLoading = false;
+    private StockResult? stockData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        
+        var api = ApiManagerSingleton.getInstance(Configuration);
+        
+        stockData = await api.GetStockAsync(Symbol);
+
+        if (stockData != null)
+        {
+            currentPrice = (decimal)stockData.Close;
+        }
+        
+        isLoading = false;
+    }
+
 
     private string GetEstimation()
     {
@@ -98,7 +119,7 @@
         isProcessing = true;
 
         // TODO: Call your DatabaseHelper to update balance
-        // and add to portfolio table
+        // and add to portfolio table 
         await Task.Delay(1500); // Simulate network lag
 
         isProcessing = false;

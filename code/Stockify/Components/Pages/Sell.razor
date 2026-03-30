@@ -1,6 +1,8 @@
 ﻿@page "/sell/{Symbol}"
 @inject NavigationManager Navigation
+@inject IConfiguration Configuration
 @using Stockify.Data
+@using Stockify.Business
 
 <div class="home-wrapper">
     <div class="stock-card">
@@ -61,6 +63,24 @@
     private bool isSellingByAmount = true;
     private bool isProcessing = false;
     private string errorMessage = "";
+    private Boolean isLoading;
+    private StockResult? stockData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        
+        var api = ApiManagerSingleton.getInstance(Configuration);
+        
+        stockData = await api.GetStockAsync(Symbol);
+
+        if (stockData != null)
+        {
+            currentPrice = (decimal)stockData.Close;
+        }
+        
+        isLoading = false;
+    }
 
     private string GetEstimation()
     {
