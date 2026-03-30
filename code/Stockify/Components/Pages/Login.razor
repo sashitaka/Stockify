@@ -1,6 +1,6 @@
 ﻿@page "/login"
 @inject NavigationManager Navigation
-@using Data
+@using Stockify.Data
 
 <div class="auth-wrapper">
     <div class="auth-card">
@@ -37,13 +37,20 @@
 
     private async Task HandleLogin()
     {
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        errorMessage = "Test de connexion en cours...";
+        StateHasChanged(); // Force the UI to update
+
+        var db = new DatabaseHelper();
+        var test = await db.TestConnection();
+
+        if (!test.success)
         {
-            errorMessage = "Veuillez remplir tous les champs.";
+            // If this triggers, your firewall or connection string is the problem
+            errorMessage = test.message;
             return;
         }
 
-        var db = new DatabaseHelper();
+        // If the test passes, proceed to actual login
         bool isValidUser = await db.Login(email, password);
         if (isValidUser)
         {
@@ -51,8 +58,7 @@
         }
         else
         {
-            errorMessage = "Email ou mot de passe incorrect.";
+            errorMessage = "Connexion au serveur réussie, mais Email ou Mot de passe incorrect.";
         }
-
     }
 }
