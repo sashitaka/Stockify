@@ -2,7 +2,7 @@
 @rendermode InteractiveServer
 @using Stockify.Business
 @inject IConfiguration Configuration
-@inject ApiManagerSingleton ApiManager
+@inject NavigationManager Navigation
 
 <PageTitle>Stockify</PageTitle>
 
@@ -19,7 +19,7 @@
 
     @if (isLoading)
     {
-        <p style="color:white;">Chargement...</p>
+        <p class="loading">Chargement...</p>
     }
     else if (!string.IsNullOrEmpty(errorMessage))
     {
@@ -27,7 +27,7 @@
     }
     else if (stock != null)
     {
-        <div class="stock-card">
+        <div class="stock-card" @onclick="GoToDetail" style="cursor:pointer;">
             <div class="stock-header">
                 <h2 class="stock-ticker">@stock.Ticker</h2>
                 <span class="stock-price">$@stock.Close.ToString("F2")</span>
@@ -76,6 +76,7 @@
                 </div>
 
             </div>
+            <p style="color:#888; font-size:13px; margin-top:16px;">Cliquez pour voir les détails →</p>
         </div>
     }
 </div>
@@ -121,5 +122,10 @@
             isLoading = false;
             StateHasChanged();
         }
+    }
+
+    private void GoToDetail()
+    {
+        Navigation.NavigateTo($"/stock/{stock!.Ticker}");
     }
 }

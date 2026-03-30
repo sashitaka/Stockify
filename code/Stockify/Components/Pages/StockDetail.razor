@@ -1,0 +1,205 @@
+﻿@page "/stock/{Ticker}"
+@rendermode InteractiveServer
+@using Stockify.Business
+@using System.Text.Json
+@inject IConfiguration Configuration
+@inject NavigationManager Navigation
+
+<PageTitle>@Ticker - Stockify</PageTitle>
+
+<div class="stock-detail-wrapper">
+
+    <button class="btn-back" @onclick='() => Navigation.NavigateTo("/")'>← Retour</button>
+
+    @if (isLoading)
+    {
+        <div class="loading">Chargement...</div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="error-box">@errorMessage</div>
+    }
+    else if (stock != null)
+    {
+        <div class="detail-header">
+            <h1 class="detail-ticker">@stock.Ticker</h1>
+            <p class="detail-price">$@stock.C.ToString("F2")</p>
+            <p class="detail-change @(stock.C >= stock.O ? "positive" : "negative")">
+                @(stock.C >= stock.O ? "▲" : "▼")
+                @((stock.C - stock.O).ToString("F2"))
+                (@(((stock.C - stock.O) / stock.O * 100).ToString("F2"))%)
+            </p>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-card">
+                <span class="detail-label">Ouverture</span>
+                <span class="detail-value">$@stock.O.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Haut du jour</span>
+                <span class="detail-value">$@stock.H.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Bas du jour</span>
+                <span class="detail-value">$@stock.L.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Fermeture</span>
+                <span class="detail-value">$@stock.C.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Volume</span>
+                <span class="detail-value">@stock.V.ToString("N0")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Prix moyen</span>
+                <span class="detail-value">$@stock.Vw.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Transactions</span>
+                <span class="detail-value">@stock.N.ToString("N0")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">52S Haut</span>
+                <span class="detail-value">$@high52.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">52S Bas</span>
+                <span class="detail-value">$@low52.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Clôture préc.</span>
+                <span class="detail-value">$@prevClose.ToString("F2")</span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">YTD</span>
+                <span class="detail-value @(ytdChange >= 0 ? "positive" : "negative")">
+                    @(ytdChange >= 0 ? "▲" : "▼") @Math.Abs(ytdChange).ToString("F2")%
+                </span>
+            </div>
+            <div class="detail-card">
+                <span class="detail-label">Variation 1 mois</span>
+                <span class="detail-value @(monthChange >= 0 ? "positive" : "negative")">
+                    @(monthChange >= 0 ? "▲" : "▼") @Math.Abs(monthChange).ToString("F2")%
+                </span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-buy">Acheter</button>
+            <button class="btn-sell">Vendre</button>
+            <button class="btn-watchlist">+ Watchlist</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Ticker { get; set; } = "";
+
+    private StockResult? stock;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private List<StockResult> history = new();
+    private List<StockResult> yearHistory = new();
+
+    private double high52 = 0;
+    private double low52 = 0;
+    private double prevClose = 0;
+    private double ytdChange = 0;
+    private double monthChange = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var api = ApiManagerSingleton.getInstance(Configuration);
+            stock = await api.GetStockAsync(Ticker);
+
+            if (stock == null)
+            {
+                errorMessage = $"Aucun résultat pour '{Ticker}'.";
+                return;
+            }
+
+            await LoadHistory();
+            await LoadYearHistory();
+            CalculateStats();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadHistory()
+    {
+        try
+        {
+            var apiKey = Configuration["MassiveApi:ApiKey"];
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+            var startDate = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd");
+            var url = $"https://api.massive.com/v2/aggs/ticker/{Ticker}/range/1/day/{startDate}/{today}?apiKey={apiKey}";
+
+            using var http = new HttpClient();
+            var json = await http.GetStringAsync(url);
+            var response = JsonSerializer.Deserialize<MassiveAggsResponse>(json);
+            history = response?.Results ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"History error: {ex.Message}");
+        }
+    }
+
+    private async Task LoadYearHistory()
+    {
+        try
+        {
+            var apiKey = Configuration["MassiveApi:ApiKey"];
+            var today = DateTime.Now.ToString("yyyy-MM-dd");
+            var startDate = DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd");
+            var url = $"https://api.massive.com/v2/aggs/ticker/{Ticker}/range/1/day/{startDate}/{today}?apiKey={apiKey}";
+
+            using var http = new HttpClient();
+            var json = await http.GetStringAsync(url);
+            var response = JsonSerializer.Deserialize<MassiveAggsResponse>(json);
+            yearHistory = response?.Results ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Year history error: {ex.Message}");
+        }
+    }
+
+    private void CalculateStats()
+    {
+        if (yearHistory.Count > 0)
+        {
+            high52 = yearHistory.Max(r => r.H);
+            low52 = yearHistory.Min(r => r.L);
+        }
+
+        if (history.Count >= 2)
+        {
+            prevClose = history[history.Count - 2].C;
+            var monthFirst = history.First().C;
+            var monthLast = history.Last().C;
+            monthChange = ((monthLast - monthFirst) / monthFirst) * 100;
+        }
+
+        var ytdStart = yearHistory
+            .Where(r => DateTimeOffset.FromUnixTimeMilliseconds(r.Timestamp).Year == DateTime.Now.Year)
+            .FirstOrDefault();
+
+        if (ytdStart != null && stock != null)
+        {
+            ytdChange = ((stock.C - ytdStart.C) / ytdStart.C) * 100;
+        }
+    }
+}

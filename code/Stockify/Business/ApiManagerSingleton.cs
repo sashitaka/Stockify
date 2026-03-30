@@ -86,5 +86,8 @@ namespace Stockify.Business
 
         [JsonPropertyName("t")]
         public long Timestamp { get; set; }
+
+        [JsonPropertyName("n")]
+        public long N { get; set; }
     }
 }
