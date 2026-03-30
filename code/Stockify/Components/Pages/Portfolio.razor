@@ -12,7 +12,6 @@
 <div class="portfolio-wrapper">
     <div class="portfolio-header">
         <h1>Mon Portfolio</h1>
-        <p class="portfolio-subtitle">Gérez vos investissements en bourse</p>
     </div>
 
     <div class="portfolio-content">
@@ -33,17 +32,13 @@
                         <th>Nom de la compagnie</th>
                         <th>Quantité</th>
                         <th>Prix moyen d'achat</th>
+                        <th>Valeur d'achat totale</th>
                         <th>Valeur actuelle</th>
-                        <th>Valeur totale</th>
+                        <th>Valeur totale actuelle</th>
                         <th>Profit/Déficit %</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="portfolio-total">
-                        <td colspan="5"><strong>Total</strong></td>
-                        <td><strong>@totalValue.ToString("C")</strong></td>
-                        <td><strong>@globalPercentage.ToString("F2")%</strong></td>
-                    </tr>
                     @foreach (var item in portfolioItems)
                     {
                         decimal itemValue = (decimal)item.QuantityOwned * item.CurrentPrice;
@@ -57,6 +52,7 @@
                             <td>@item.Name</td>
                             <td>@item.QuantityOwned.ToString("F2")</td>
                             <td>@averageCost.ToString("C")</td>
+                            <td>@item.OwnedValue.ToString("C")</td>
                             <td>@item.CurrentPrice.ToString("C")</td>
                             <td>@itemValue.ToString("C")</td>
                             <td class="@(profitPercentage >= 0 ? "text-success" : "text-danger")">
@@ -64,6 +60,18 @@
                             </td>
                         </tr>
                     }
+                    @{
+                        string totalRowClass = globalPercentage >= 0 ? "profit" : "deficit";
+                    }
+                    <tr class="portfolio-total @totalRowClass">
+                        <td colspan="4"><strong>Total</strong></td>
+                        <td><strong>@portfolioItems.Sum(p => (decimal)p.OwnedValue).ToString("C")</strong></td>
+                        <td></td>
+                        <td><strong>@totalValue.ToString("C")</strong></td>
+                        <td class="@(globalPercentage >= 0 ? "text-success" : "text-danger")">
+                            <strong>@globalPercentage.ToString("F2")%</strong>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         }
@@ -85,9 +93,9 @@
         if (user.Identity?.IsAuthenticated ?? false)
         {
             userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
-            await LoadPortfolio();
         }
 
+        await LoadPortfolio();
         isLoading = false;
     }
 
@@ -95,6 +103,96 @@
     {
         try
         {
+            // Ajouter des placeholders pour tester le CSS
+            portfolioItems.Add(new PortfolioItem
+            {
+                Ticker = "AAPL",
+                Name = "Apple Inc.",
+                Market = "stocks",
+                Locale = "us",
+                PrimaryExchange = "XNAS",
+                Type = "CS",
+                Active = true,
+                CurrencyName = "USD",
+                OwnedValue = 1500.00f,
+                QuantityOwned = 10.00f,
+                CurrentPrice = 175.50m
+            });
+
+            portfolioItems.Add(new PortfolioItem
+            {
+                Ticker = "GOOGL",
+                Name = "Alphabet Inc.",
+                Market = "stocks",
+                Locale = "us",
+                PrimaryExchange = "XNAS",
+                Type = "CS",
+                Active = true,
+                CurrencyName = "USD",
+                OwnedValue = 2800.00f,
+                QuantityOwned = 45.00f,
+                CurrentPrice = 140.25m
+            });
+
+            portfolioItems.Add(new PortfolioItem
+            {
+                Ticker = "MSFT",
+                Name = "Microsoft Corporation",
+                Market = "stocks",
+                Locale = "us",
+                PrimaryExchange = "XNAS",
+                Type = "CS",
+                Active = true,
+                CurrencyName = "USD",
+                OwnedValue = 2000.00f,
+                QuantityOwned = 8.00f,
+                CurrentPrice = 280.75m
+            });
+
+            portfolioItems.Add(new PortfolioItem
+            {
+                Ticker = "TSLA",
+                Name = "Tesla Inc.",
+                Market = "stocks",
+                Locale = "us",
+                PrimaryExchange = "XNAS",
+                Type = "CS",
+                Active = true,
+                CurrencyName = "USD",
+                OwnedValue = 3500.00f,
+                QuantityOwned = 6.00f,
+                CurrentPrice = 245.30m
+            });
+
+            portfolioItems.Add(new PortfolioItem
+            {
+                Ticker = "AMZN",
+                Name = "Amazon.com Inc.",
+                Market = "stocks",
+                Locale = "us",
+                PrimaryExchange = "XNAS",
+                Type = "CS",
+                Active = true,
+                CurrencyName = "USD",
+                OwnedValue = 1200.00f,
+                QuantityOwned = 3.00f,
+                CurrentPrice = 190.50m
+            });
+
+            // Calculer le total et pourcentage
+            foreach (var item in portfolioItems)
+            {
+                totalValue += (decimal)item.QuantityOwned * item.CurrentPrice;
+            }
+
+            decimal totalInvested = (decimal)portfolioItems.Sum(p => p.OwnedValue);
+            if (totalInvested > 0)
+            {
+                globalPercentage = ((totalValue - totalInvested) / totalInvested) * 100;
+            }
+
+            // Décommenter la section suivante pour charger depuis la base de données
+            /*
             using (var connection = DatabaseHelper.GetConnection())
             {
                 await connection.OpenAsync();
@@ -160,6 +258,7 @@
                     globalPercentage = ((totalValue - totalInvested) / totalInvested) * 100;
                 }
             }
+            */
         }
         catch (Exception ex)
         {
@@ -168,75 +267,5 @@
     }
 }
 
-<style>
-    .portfolio-wrapper {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
 
-    .portfolio-header {
-        margin-bottom: 30px;
-    }
-
-    .portfolio-header h1 {
-        margin: 0;
-        color: #333;
-    }
-
-    .portfolio-subtitle {
-        color: #666;
-        margin-top: 5px;
-    }
-
-    .portfolio-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .portfolio-table thead {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .portfolio-table th {
-        padding: 15px;
-        text-align: left;
-        font-weight: 600;
-    }
-
-    .portfolio-table td {
-        padding: 12px 15px;
-        border-bottom: 1px solid #eee;
-    }
-
-    .portfolio-table tbody tr:hover {
-        background-color: #f9f9f9;
-    }
-
-    .portfolio-total {
-        background-color: #f0f0f0;
-        font-weight: bold;
-    }
-
-    .portfolio-stock.profit {
-        background-color: #e8f5e9;
-    }
-
-    .portfolio-stock.deficit {
-        background-color: #ffebee;
-    }
-
-    .text-success {
-        color: #28a745;
-    }
-
-    .text-danger {
-        color: #dc3545;
-    }
-</style>
 
