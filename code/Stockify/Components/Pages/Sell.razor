@@ -1,0 +1,112 @@
+﻿@page "/sell/{Symbol}"
+@inject NavigationManager Navigation
+@using Stockify.Data
+
+<div class="home-wrapper">
+    <div class="stock-card">
+        <div class="stock-header">
+            <h2 class="stock-ticker">Vendre @Symbol</h2>
+            <div class="stock-price">@currentPrice.ToString("C2")</div>
+        </div>
+        
+        <p class="auth-subtitle" style="text-align: left; margin-bottom: 20px;">
+            Actions possédées: <span style="color: #ff4444; font-weight: bold;">@ownedShares.ToString("F6")</span>
+        </p>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-box">@errorMessage</div>
+        }
+
+        <div class="form-group">
+            <label>Mode de vente</label>
+            <select @bind="isSellingByAmount" class="form-group input" style="background: #2a2a2a; width: 100%; cursor: pointer;">
+                <option value="true">Vendre par Montant ($)</option>
+                <option value="false">Vendre par Quantité (Actions)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>@(isSellingByAmount ? "Montant à récupérer ($)" : "Nombre d'actions à vendre")</label>
+            <input type="number" step="0.01" @bind="inputValue" @bind:event="oninput" placeholder="0.00" />
+        </div>
+
+        <div class="stock-details" style="margin-top: 20px; margin-bottom: 20px;">
+            <div class="detail-item">
+                <span class="detail-label">Crédit estimé</span>
+                <span class="detail-value" style="color: #00c853;">@GetEstimation()</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Actions restantes</span>
+                <span class="detail-value">@GetRemainingShares()</span>
+            </div>
+        </div>
+
+        <button class="btn-primary" style="background: #ff4444;" @onclick="ConfirmSale" disabled="@isProcessing">
+            @(isProcessing ? "Transaction..." : "Confirmer la vente")
+        </button>
+        
+        <button class="btn-secondary" style="margin-top: 10px;" @onclick='() => Navigation.NavigateTo("/")'>
+            Annuler
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Symbol { get; set; } = "";
+
+    private decimal currentPrice = 52450.25m; // Fetch from API
+    private decimal ownedShares = 0.525m;     // Fetch from Database Holdings
+    private decimal inputValue;
+    private bool isSellingByAmount = true;
+    private bool isProcessing = false;
+    private string errorMessage = "";
+
+    private string GetEstimation()
+    {
+        if (inputValue <= 0) return isSellingByAmount ? "0 actions" : "$0.00";
+
+        if (isSellingByAmount)
+        {
+            decimal sharesToSell = inputValue / currentPrice;
+            return $"{sharesToSell:F6} actions";
+        }
+        return (inputValue * currentPrice).ToString("C2");
+    }
+
+    private string GetRemainingShares()
+    {
+        decimal sharesToSell = isSellingByAmount ? (inputValue / currentPrice) : inputValue;
+        decimal remaining = ownedShares - sharesToSell;
+        return remaining < 0 ? "Insuffisant" : remaining.ToString("F6");
+    }
+
+    private async Task ConfirmSale()
+    {
+        errorMessage = "";
+        decimal sharesToSell = isSellingByAmount ? (inputValue / currentPrice) : inputValue;
+
+        if (sharesToSell <= 0)
+        {
+            errorMessage = "Veuillez entrer une valeur valide.";
+            return;
+        }
+
+        if (sharesToSell > ownedShares)
+        {
+            errorMessage = "Vous n'avez pas assez d'actions.";
+            return;
+        }
+
+        isProcessing = true;
+        
+        // Logic for DatabaseHelper:
+        // 1. Add (sharesToSell * currentPrice) to Users.Balance
+        // 2. Subtract sharesToSell from Portfolio table
+        
+        await Task.Delay(1500);
+
+        isProcessing = false;
+        Navigation.NavigateTo("/portfolio");
+    }
+}

@@ -1,0 +1,107 @@
+﻿@page "/achat/{Symbol}"
+@inject NavigationManager Navigation
+@using Stockify.Data
+
+<div class="home-wrapper">
+    <div class="stock-card">
+        <div class="stock-header">
+            <h2 class="stock-ticker">Acheter @Symbol</h2>
+            <div class="stock-price">@currentPrice.ToString("C2")</div>
+        </div>
+        
+        <p class="auth-subtitle" style="text-align: left; margin-bottom: 20px;">
+            Solde disponible: <span style="color: #00c853; font-weight: bold;">@userBalance.ToString("C2")</span>
+        </p>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-box">@errorMessage</div>
+        }
+
+        <div class="form-group">
+            <label>Mode de calcul</label>
+            <select @bind="isBuyingByAmount" class="form-group input" style="background: #2a2a2a; width: 100%; cursor: pointer;">
+                <option value="true">Acheter par Montant ($)</option>
+                <option value="false">Acheter par Quantité (Actions)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>@(isBuyingByAmount ? "Combien voulez-vous investir ?" : "Nombre d'actions à acheter")</label>
+            <input type="number" step="0.01" @bind="inputValue" @bind:event="oninput" placeholder="0.00" />
+        </div>
+
+        <div class="stock-details" style="margin-top: 20px; margin-bottom: 20px;">
+            <div class="detail-item">
+                <span class="detail-label">Estimation</span>
+                <span class="detail-value">@GetEstimation()</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Total Frais</span>
+                <span class="detail-value">$0.00</span>
+            </div>
+        </div>
+
+        <button class="btn-primary" @onclick="ConfirmPurchase" disabled="@isProcessing">
+            @(isProcessing ? "Transaction en cours..." : "Confirmer l'achat")
+        </button>
+        
+        <button class="btn-secondary" style="margin-top: 10px;" @onclick='() => Navigation.NavigateTo("/")'>
+            Annuler
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Symbol { get; set; } = "";
+
+    private decimal currentPrice = 52450.25m; // Replace with API call later
+    private decimal userBalance = 1000.00m;  // Replace with DB call later
+    private decimal inputValue;
+    private bool isBuyingByAmount = true;
+    private bool isProcessing = false;
+    private string errorMessage = "";
+
+    private string GetEstimation()
+    {
+        if (inputValue <= 0) return isBuyingByAmount ? "0 actions" : "$0.00";
+
+        if (isBuyingByAmount)
+        {
+            decimal shares = inputValue / currentPrice;
+            return $"{shares:F6} actions";
+        }
+        else
+        {
+            decimal cost = inputValue * currentPrice;
+            return cost.ToString("C2");
+        }
+    }
+
+    private async Task ConfirmPurchase()
+    {
+        errorMessage = "";
+        decimal totalCost = isBuyingByAmount ? inputValue : (inputValue * currentPrice);
+
+        if (totalCost <= 0)
+        {
+            errorMessage = "Veuillez entrer un montant valide.";
+            return;
+        }
+
+        if (totalCost > userBalance)
+        {
+            errorMessage = "Solde insuffisant pour cet achat.";
+            return;
+        }
+
+        isProcessing = true;
+
+        // TODO: Call your DatabaseHelper to update balance
+        // and add to portfolio table
+        await Task.Delay(1500); // Simulate network lag
+
+        isProcessing = false;
+        Navigation.NavigateTo("/portfolio");
+    }
+}

@@ -67,22 +67,22 @@ namespace Stockify.Business
         public string? Ticker { get; set; }
 
         [JsonPropertyName("o")]
-        public double O { get; set; }
+        public double Open { get; set; }
 
         [JsonPropertyName("c")]
-        public double C { get; set; }
+        public double Close { get; set; }
 
         [JsonPropertyName("h")]
-        public double H { get; set; }
+        public double High { get; set; }
 
         [JsonPropertyName("l")]
-        public double L { get; set; }
+        public double Low { get; set; }
 
         [JsonPropertyName("v")]
-        public double V { get; set; }
+        public double Volume { get; set; }
 
         [JsonPropertyName("vw")]
-        public double Vw { get; set; }
+        public double VWAP { get; set; }
 
         [JsonPropertyName("t")]
         public long Timestamp { get; set; }

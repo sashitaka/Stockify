@@ -30,38 +30,51 @@
         <div class="stock-card">
             <div class="stock-header">
                 <h2 class="stock-ticker">@stock.Ticker</h2>
-                <span class="stock-price">$@stock.C.ToString("F2")</span>
+                <span class="stock-price">$@stock.Close.ToString("F2")</span>
             </div>
-            <div class="stock-change @(stock.C >= stock.O ? "positive" : "negative")">
-                @(stock.C >= stock.O ? "▲" : "▼")
-                @((stock.C - stock.O).ToString("F2"))
-                (@(((stock.C - stock.O) / stock.O * 100).ToString("F2"))%)
+            <div class="stock-change @(stock.Close >= stock.Open ? "positive" : "negative")">
+                @(stock.Close >= stock.Open ? "▲" : "▼")
+                @((stock.Close - stock.Open).ToString("F2"))
+                (@(((stock.Close - stock.Open) / stock.Open * 100).ToString("F2"))%)
             </div>
             <div class="stock-details">
                 <div class="detail-item">
                     <span class="detail-label">Ouverture</span>
-                    <span class="detail-value">$@stock.O.ToString("F2")</span>
+                    <span class="detail-value">$@stock.Open.ToString("F2")</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Haut</span>
-                    <span class="detail-value">$@stock.H.ToString("F2")</span>
+                    <span class="detail-value">$@stock.High.ToString("F2")</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Bas</span>
-                    <span class="detail-value">$@stock.L.ToString("F2")</span>
+                    <span class="detail-value">$@stock.Low.ToString("F2")</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Fermeture</span>
-                    <span class="detail-value">$@stock.C.ToString("F2")</span>
+                    <span class="detail-value">$@stock.Close.ToString("F2")</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Volume</span>
-                    <span class="detail-value">@stock.V.ToString("N0")</span>
+                    <span class="detail-value">@stock.Volume.ToString("N0")</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Prix moyen</span>
-                    <span class="detail-value">$@stock.Vw.ToString("F2")</span>
+                    <span class="detail-value">$@stock.VWAP.ToString("F2")</span>
                 </div>
+
+                <div class="detail-item">
+                    <NavLink class="detail-value" href="@($"/achat/{stock.Ticker}")">
+                        Achat
+                    </NavLink>
+                </div>
+
+                <div class="detail-item">
+                    <NavLink class="detail-value" href="@($"/sell/{stock.Ticker}")">
+                        Vente
+                    </NavLink>
+                </div>
+
             </div>
         </div>
     }
