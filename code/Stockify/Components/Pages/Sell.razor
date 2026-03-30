@@ -57,8 +57,8 @@
 @code {
     [Parameter] public string Symbol { get; set; } = "";
 
-    private decimal currentPrice = 52450.25m; // Fetch from API
-    private decimal ownedShares = 0.525m;     // Fetch from Database Holdings
+    private decimal currentPrice = 52450.25m; // fetch du api
+    private decimal ownedShares = 0.525m;     // Fetch de la Database
     private decimal inputValue;
     private bool isSellingByAmount = true;
     private bool isProcessing = false;
@@ -120,9 +120,8 @@
 
         isProcessing = true;
         
-        // Logic for DatabaseHelper:
-        // 1. Add (sharesToSell * currentPrice) to Users.Balance
-        // 2. Subtract sharesToSell from Portfolio table
+        // mettre Logic for DatabaseHelper:
+       
         
         await Task.Delay(1500);
 

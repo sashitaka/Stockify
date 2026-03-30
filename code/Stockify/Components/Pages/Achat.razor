@@ -57,8 +57,8 @@
 @code {
     [Parameter] public string Symbol { get; set; } = "";
 
-    private decimal currentPrice = 52450.25m; // Replace with API call later
-    private decimal userBalance = 1000.00m;  // Replace with DB call later
+    private decimal currentPrice = 52450.25m; 
+    private decimal userBalance = 1000.00m;  // valeur par default a changer a la creation de la db
     private decimal inputValue;
     private bool isBuyingByAmount = true;
     private bool isProcessing = false;
@@ -118,9 +118,8 @@
 
         isProcessing = true;
 
-        // TODO: Call your DatabaseHelper to update balance
-        // and add to portfolio table 
-        await Task.Delay(1500); // Simulate network lag
+        // TODO: Call your DatabaseHelper and do stuff
+        await Task.Delay(1500);
 
         isProcessing = false;
         Navigation.NavigateTo("/portfolio");
