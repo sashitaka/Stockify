@@ -38,7 +38,7 @@
     private async Task HandleLogin()
     {
         errorMessage = "Test de connexion en cours...";
-        StateHasChanged(); // Force the UI to update
+        StateHasChanged(); 
 
         var db = new DatabaseHelper();
         var test = await db.TestConnection();
@@ -50,7 +50,7 @@
             return;
         }
 
-        // If the test passes, proceed to actual login
+        
         bool isValidUser = await db.Login(email, password);
         if (isValidUser)
         {

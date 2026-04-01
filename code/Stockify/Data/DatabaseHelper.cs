@@ -24,7 +24,7 @@ namespace Stockify.Data
                 }
                 catch (SqlException ex)
                 {
-                    // This will capture the specific Azure error (like IP Blocked)
+                    
                     return (false, $"Erreur SQL: {ex.Message}");
                 }
                 catch (Exception ex)
@@ -36,7 +36,7 @@ namespace Stockify.Data
 
         public async Task<bool> Login(string email, string password)
         {
-            // Updated to use the 'PasswordHash' column name from your screenshot
+            
             string query = "SELECT PasswordHash FROM Users WHERE Email = @email";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -54,15 +54,13 @@ namespace Stockify.Data
                         {
                             string storedHash = result.ToString();
 
-                            // Note: If you stored the password as plain text in 'PasswordHash', 
-                            // this direct comparison will work. 
-                            // If you hashed it, you'll need BCrypt.Verify(password, storedHash).
+                           
                             return storedHash.Trim() == password.Trim();
                         }
                     }
                     catch (Exception ex)
                     {
-                        // Basic error handling
+                        
                         return false;
                     }
                 }
