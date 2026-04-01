@@ -23,38 +23,38 @@
     {
         <div class="detail-header">
             <h1 class="detail-ticker">@stock.Ticker</h1>
-            <p class="detail-price">$@stock.C.ToString("F2")</p>
-            <p class="detail-change @(stock.C >= stock.O ? "positive" : "negative")">
-                @(stock.C >= stock.O ? "▲" : "▼")
-                @((stock.C - stock.O).ToString("F2"))
-                (@(((stock.C - stock.O) / stock.O * 100).ToString("F2"))%)
+            <p class="detail-price">$@stock.Close.ToString("F2")</p>
+            <p class="detail-change @(stock.Close >= stock.Open ? "positive" : "negative")">
+                @(stock.Close >= stock.Open ? "▲" : "▼")
+                @((stock.Close - stock.Open).ToString("F2"))
+                (@(((stock.Close - stock.Open) / stock.Open * 100).ToString("F2"))%)
             </p>
         </div>
 
         <div class="detail-grid">
             <div class="detail-card">
                 <span class="detail-label">Ouverture</span>
-                <span class="detail-value">$@stock.O.ToString("F2")</span>
+                <span class="detail-value">$@stock.Open.ToString("F2")</span>
             </div>
             <div class="detail-card">
                 <span class="detail-label">Haut du jour</span>
-                <span class="detail-value">$@stock.H.ToString("F2")</span>
+                <span class="detail-value">$@stock.High.ToString("F2")</span>
             </div>
             <div class="detail-card">
                 <span class="detail-label">Bas du jour</span>
-                <span class="detail-value">$@stock.L.ToString("F2")</span>
+                <span class="detail-value">$@stock.Low.ToString("F2")</span>
             </div>
             <div class="detail-card">
                 <span class="detail-label">Fermeture</span>
-                <span class="detail-value">$@stock.C.ToString("F2")</span>
+                <span class="detail-value">$@stock.Close.ToString("F2")</span>
             </div>
             <div class="detail-card">
                 <span class="detail-label">Volume</span>
-                <span class="detail-value">@stock.V.ToString("N0")</span>
+                <span class="detail-value">@stock.Volume.ToString("N0")</span>
             </div>
             <div class="detail-card">
                 <span class="detail-label">Prix moyen</span>
-                <span class="detail-value">$@stock.Vw.ToString("F2")</span>
+                <span class="detail-value">$@stock.VWAP.ToString("F2")</span>
             </div>
             <div class="detail-card">
                 <span class="detail-label">Transactions</span>
@@ -87,8 +87,8 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-buy">Acheter</button>
-            <button class="btn-sell">Vendre</button>
+            <NavLink class="btn-buy" href="@($"/achat/{stock.Ticker}")">Acheter</NavLink>
+            <NavLink class="btn-sell" href="@($"/sell/{stock.Ticker}")">Vendre</NavLink>
             <button class="btn-watchlist">+ Watchlist</button>
         </div>
     }
@@ -181,15 +181,15 @@
     {
         if (yearHistory.Count > 0)
         {
-            high52 = yearHistory.Max(r => r.H);
-            low52 = yearHistory.Min(r => r.L);
+            high52 = yearHistory.Max(r => r.High);
+            low52 = yearHistory.Min(r => r.Low);
         }
 
         if (history.Count >= 2)
         {
-            prevClose = history[history.Count - 2].C;
-            var monthFirst = history.First().C;
-            var monthLast = history.Last().C;
+            prevClose = history[history.Count - 2].Close;
+            var monthFirst = history.First().Close;
+            var monthLast = history.Last().Close;
             monthChange = ((monthLast - monthFirst) / monthFirst) * 100;
         }
 
@@ -199,7 +199,7 @@
 
         if (ytdStart != null && stock != null)
         {
-            ytdChange = ((stock.C - ytdStart.C) / ytdStart.C) * 100;
+            ytdChange = ((stock.Close - ytdStart.Close) / ytdStart.Close) * 100;
         }
     }
 }
