@@ -1,36 +1,26 @@
-﻿using System.Transactions;
-
-namespace Stockify.Business
+﻿namespace Stockify.Business
 {
     public class User
     {
         private int id;
-        private string username;
-        private int password;
+        private string name;
         private string email;
-        private string phone;
-        private List<PortfolioItem> portfolioListe;
-        private List<Transaction> transactionsListe;
+        private string passwordHashed;
+        private decimal balance;
 
-
-        public User(int id, string username, int password, string email, string phone)
+        public User(int id, string name, string email, string passwordHashed, decimal balance)
         {
             this.id = id;
-            this.username = username;
-            this.password = password;
+            this.name = name;
             this.email = email;
-            this.phone = phone;
-            this.portfolioListe = new List<PortfolioItem>();
-            this.transactionsListe = new List<Transaction>();
+            this.passwordHashed = passwordHashed;
+            this.balance = balance;
         }
 
         public int Id { get => id; set => id = value; }
-        public string Username { get => username; set => username = value; }
-        public int Password { get => password; set => password = value; }
+        public string Name { get => name; set => name = value; }
         public string Email { get => email; set => email = value; }
-        public string Phone { get => phone; set => phone = value; }
-        public List<PortfolioItem> Portfolio { get => portfolioListe; set => portfolioListe = value; }
-
-
+        public string PasswordHashed { get => passwordHashed; set => passwordHashed = value; }
+        public decimal Balance { get => balance; set => balance = value; }
     }
 }

@@ -21,6 +21,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddScoped<DatabaseHelper>();
+builder.Services.AddScoped<UserSession>();
 builder.Services.AddSingleton<ApiManagerSingleton>(sp =>
     ApiManagerSingleton.getInstance(sp.GetRequiredService<IConfiguration>()));
 

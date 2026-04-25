@@ -2,6 +2,7 @@
 @using Stockify.Data
 @inject DatabaseHelper DB
 @inject NavigationManager Nav
+@inject UserSession Session
 
 <h3>Connexion</h3>
 
@@ -36,6 +37,8 @@
 
         if (userId != -1)
         {
+            Session.UserId = userId;
+            Session.Name = await DB.GetUserName(userId);
             Nav.NavigateTo("/");
         }
         else
