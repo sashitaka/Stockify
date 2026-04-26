@@ -7,6 +7,7 @@
 @inject ApiManagerSingleton ApiManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserSession CurrentUser
+@inject IConfiguration Configuration
 
 <PageTitle>Portfolio - Stockify</PageTitle>
 
@@ -32,28 +33,26 @@
                         <th>Ticker</th>
                         <th>Nom de la compagnie</th>
                         <th>Quantité</th>
-                        <th>Prix moyen d'achat</th>
-                        <th>Valeur d'achat totale</th>
-                        <th>Valeur actuelle</th>
-                        <th>Valeur totale actuelle</th>
+                        <th>Valeur actuelle du Stock</th>
+                        <th>Valeur totale actuelle possede</th>
                         <th>Profit/Déficit %</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in portfolioItems)
                     {
-                        decimal itemValue = (decimal)item.QuantityOwned * item.CurrentPrice;
-                        decimal averageCost = item.QuantityOwned > 0 ? (decimal)item.OwnedValue / (decimal)item.QuantityOwned : 0;
-                        decimal profit = itemValue - (decimal)item.OwnedValue;
-                        decimal profitPercentage = item.OwnedValue > 0 ? (profit / (decimal)item.OwnedValue) * 100 : 0;
-                        string rowClass = profitPercentage >= 0 ? "profit" : "deficit";
-
-                        <tr class="portfolio-stock @rowClass">
+                        // Calculate values based on the data we HAVE
+                        double itemValue = item.QuantityOwned * item.CurrentPrice;
+        
+                        // Note: OwnedValue is currently set to current price in your loop,
+                        // so profit will show as 0% for now.
+                        double profit = itemValue - item.OwnedValue;
+                        double profitPercentage = item.OwnedValue > 0 ? (profit / item.OwnedValue) * 100 : 0;
+        
+                        <tr class="portfolio-stock">
                             <td><strong>@item.Ticker</strong></td>
                             <td>@item.Name</td>
                             <td>@item.QuantityOwned.ToString("F2")</td>
-                            <td>@averageCost.ToString("C")</td>
-                            <td>@item.OwnedValue.ToString("C")</td>
                             <td>@item.CurrentPrice.ToString("C")</td>
                             <td>@itemValue.ToString("C")</td>
                             <td class="@(profitPercentage >= 0 ? "text-success" : "text-danger")">
@@ -61,18 +60,6 @@
                             </td>
                         </tr>
                     }
-                    @{
-                        string totalRowClass = globalPercentage >= 0 ? "profit" : "deficit";
-                    }
-                    <tr class="portfolio-total @totalRowClass">
-                        <td colspan="4"><strong>Total</strong></td>
-                        <td><strong>@portfolioItems.Sum(p => (decimal)p.OwnedValue).ToString("C")</strong></td>
-                        <td></td>
-                        <td><strong>@totalValue.ToString("C")</strong></td>
-                        <td class="@(globalPercentage >= 0 ? "text-success" : "text-danger")">
-                            <strong>@globalPercentage.ToString("F2")%</strong>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         }
@@ -87,37 +74,37 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var api = ApiManagerSingleton.getInstance(Configuration);
         try
         {
             isLoading = true;
+            portfolioItems.Clear();
 
-            if (CurrentUser.IsLoggedIn)
+            if (CurrentUser.IsLoggedIn && CurrentUser.UserId != -1)
             {
-                int userId = CurrentUser.UserId;
 
-                if (userId != -1)
-                {
                     // 2. Fetch user stocks from the database
                     // Assuming DatabaseHelper.GetPortfolio(userId) returns a list of your stock objects
-                    var userStocks = await DatabaseHelper.GetPortfolio(userId);
+                var userStocks = await DatabaseHelper.GetPortfolio(CurrentUser.UserId);
 
                     foreach (var stock in userStocks)
                     {
-                        // 3. Fetch real-time price from your ApiManager
-                        // Assuming GetCurrentPrice returns a decimal or float
-                        //var currentPrice = await ApiManager.GetStockAsync(stock.Ticker);
+                        // get price first into a local variable
+                        double currentPrice = await api.GetPriceByNameAsync(stock.StockName);
+						string ticker = await api.GetTickerBySearchAsync(stock.StockName);
 
                         portfolioItems.Add(new PortfolioItemViewModel
                         {
+                            Ticker = ticker ?? "N/A",
                             Name = stock.StockName,
-                            QuantityOwned = stock.Quantity,
-                            //OwnedValue = currentPrice * (decimal)stock.Quantity, // Total cost basis
-                            //CurrentPrice = (decimal)currentPrice
+                            QuantityOwned = (double)stock.Quantity,
+                            CurrentPrice = currentPrice,
+                            OwnedValue = currentPrice * (double)stock.Quantity
                         });
                     }
 
                     CalculateTotals();
-                }
+                
             }
         }
         catch (Exception ex)
@@ -128,13 +115,14 @@
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 
     private void CalculateTotals()
     {
         decimal totalCostBasis = portfolioItems.Sum(item => (decimal)item.OwnedValue);
-        totalValue = portfolioItems.Sum(item => (decimal)item.QuantityOwned * item.CurrentPrice);
+        totalValue = portfolioItems.Sum(item => (decimal)(item.QuantityOwned * (float)item.CurrentPrice));
 
         if (totalCostBasis > 0)
         {
@@ -147,9 +135,9 @@
     {
         public string Ticker { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
-        public float QuantityOwned { get; set; }
-        public float OwnedValue { get; set; } // Your purchase cost
-        public decimal CurrentPrice { get; set; }
+        public double QuantityOwned { get; set; }
+        public double OwnedValue { get; set; } // Your purchase cost
+        public double CurrentPrice { get; set; }
     }
 }
 

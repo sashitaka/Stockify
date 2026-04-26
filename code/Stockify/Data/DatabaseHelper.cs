@@ -367,25 +367,30 @@ namespace Stockify.Data
         /// <summary>
         /// Retourne le portfolio d'un utilisateur.
         /// </summary>
-        public async Task<List<(int StockID, string StockName, float Quantity)>> GetPortfolio(int userId)
+        public async Task<List<(string StockName, decimal Quantity)>> GetPortfolio(int userId)
         {
-            var portfolio = new List<(int, string, float)>();
-            string query = @"SELECT p.StockID, s.StockName, p.Quantity
-                             FROM PortfolioItems p
-                             JOIN Stocks s ON p.StockID = s.StockID
-                             WHERE p.UserID = @userId";
+            var portfolio = new List<(string StockName, decimal Quantity)>();
+
+            // Cleaned up the query string
+            string query = "SELECT StockName, Quantity FROM PortfolioItems WHERE UserID = @userId";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 cmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+
                 try
                 {
                     await conn.OpenAsync();
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
-                            portfolio.Add(((int)reader["StockID"], reader["StockName"].ToString(), (float)reader["Quantity"]));
+                        { 
+                            string name = reader["StockName"]?.ToString() ?? string.Empty;
+                            decimal qty = (decimal)reader["Quantity"];
+
+                            portfolio.Add((name, qty));
+                        }
                     }
                 }
                 catch (Exception ex)

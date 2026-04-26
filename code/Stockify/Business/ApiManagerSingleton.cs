@@ -28,30 +28,6 @@ namespace Stockify.Business
             return _instance;
         }
 
-        /*
-        public async Task<StockResult?> GetStockAsync(string CompanyName)
-        {
-            try
-            {
-                string url = $"https://api.massive.com/v3/reference/tickers?search={CompanyName}&active=true&apiKey={_apiKey}";
-                Console.WriteLine($"URL: {url}");
-
-                var response = await _httpClient.GetAsync(url);
-                var json = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"JSON: {json}");
-
-                if (!response.IsSuccessStatusCode) return null;
-
-                var result = JsonSerializer.Deserialize<MassiveAggsResponse>(json);
-                return result?.Results?.FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception: {ex.Message}");
-                return null;
-            }
-        }
-        */
 
         public async Task<StockResult?> GetStockAsync(string input)
         {
@@ -129,7 +105,56 @@ namespace Stockify.Business
                 return null;
             }
         }
+
+        /// <summary>
+        /// Returns the current closing price of a stock based on a company name search.
+        /// </summary>
+        /// <param name="companyName">The name of the company (e.g., "Microsoft")</param>
+        /// <returns>The price as a double, or 0 if not found.</returns>
+        public async Task<double> GetPriceByNameAsync(string companyName)
+        {
+            if (string.IsNullOrWhiteSpace(companyName)) return 0;
+
+            try
+            {
+                string searchUrl = $"https://api.massive.com/v3/reference/tickers?search={Uri.EscapeDataString(companyName)}&active=true&limit=1&apiKey={_apiKey}";
+
+                var searchResponse = await _httpClient.GetFromJsonAsync<MassiveTickerResponse>(searchUrl);
+                string? ticker = searchResponse?.Results?.FirstOrDefault()?.Ticker;
+
+                if (string.IsNullOrEmpty(ticker))
+                {
+                    Console.WriteLine($"Could not find a ticker for: {companyName}");
+                    return 0;
+                }
+
+                string priceUrl = $"https://api.massive.com/v2/aggs/ticker/{ticker.ToUpper()}/prev?adjusted=true&apiKey={_apiKey}";
+
+                // Log the raw response first
+                var httpResponse = await _httpClient.GetAsync(priceUrl);
+                var jsonContent = await httpResponse.Content.ReadAsStringAsync();
+                
+                Console.WriteLine($"Price API Response for {ticker}: {jsonContent}");
+
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"API Error: {httpResponse.StatusCode}");
+                    return 0;
+                }
+
+                var priceResponse = JsonSerializer.Deserialize<MassiveAggsResponse>(jsonContent);
+                var result = priceResponse?.Results?.FirstOrDefault();
+
+                return result?.Close ?? 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching price for {companyName}: {ex.Message}\n{ex.StackTrace}");
+                return 0;
+            }
+        }
     }
+
     public class MassiveAggsResponse
     {
         [JsonPropertyName("ticker")]
