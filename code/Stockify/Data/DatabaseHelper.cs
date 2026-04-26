@@ -279,7 +279,7 @@ namespace Stockify.Data
         /// <summary>
         /// Vend une quantité de stock pour un utilisateur.
         /// </summary>
-        public async Task<(bool success, string message)> SellStock(int userId, string ticker, decimal quantity, decimal totalGain)
+        public async Task<(bool success, string message)> SellStock(int userId, string ticker, float quantity, float totalGain)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -299,14 +299,14 @@ namespace Stockify.Data
                         }
 
                         // Vérifier la quantité disponible
-                        decimal currentQty;
+                        float currentQty;
                         using (SqlCommand checkCmd = new SqlCommand("SELECT Quantity FROM PortfolioItems WHERE UserID = @userId AND StockID = @stockId", conn, transaction))
                         {
                             checkCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
                             checkCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
                             var result = await checkCmd.ExecuteScalarAsync();
                             if (result == null) return (false, "Vous ne possédez pas ce stock.");
-                            currentQty = (decimal)result;
+                            currentQty = (float)result;
                         }
 
                         if (currentQty < quantity)
@@ -367,9 +367,9 @@ namespace Stockify.Data
         /// <summary>
         /// Retourne le portfolio d'un utilisateur.
         /// </summary>
-        public async Task<List<(int StockID, string StockName, decimal Quantity)>> GetPortfolio(int userId)
+        public async Task<List<(int StockID, string StockName, float Quantity)>> GetPortfolio(int userId)
         {
-            var portfolio = new List<(int, string, decimal)>();
+            var portfolio = new List<(int, string, float)>();
             string query = @"SELECT p.StockID, s.StockName, p.Quantity
                              FROM PortfolioItems p
                              JOIN Stocks s ON p.StockID = s.StockID
@@ -385,7 +385,7 @@ namespace Stockify.Data
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
-                            portfolio.Add(((int)reader["StockID"], reader["StockName"].ToString(), (decimal)reader["Quantity"]));
+                            portfolio.Add(((int)reader["StockID"], reader["StockName"].ToString(), (float)reader["Quantity"]));
                     }
                 }
                 catch (Exception ex)
@@ -399,9 +399,9 @@ namespace Stockify.Data
         /// <summary>
         /// Retourne l'historique des transactions d'un utilisateur.
         /// </summary>
-        public async Task<List<(int TransactionID, string StockName, string Type, decimal Quantity, DateTime Date)>> GetTransactionHistory(int userId)
+        public async Task<List<(int TransactionID, string StockName, string Type, float Quantity, DateTime Date)>> GetTransactionHistory(int userId)
         {
-            var history = new List<(int, string, string, decimal, DateTime)>();
+            var history = new List<(int, string, string, float, DateTime)>();
             string query = @"SELECT t.TransactionID, s.StockName, t.TransacType, t.Quantity, t.TransacDate
                              FROM Transactions t
                              JOIN Stocks s ON t.StockID = s.StockID
@@ -423,7 +423,7 @@ namespace Stockify.Data
                                 (int)reader["TransactionID"],
                                 reader["StockName"].ToString(),
                                 reader["TransacType"].ToString(),
-                                (decimal)reader["Quantity"],
+                                (float)reader["Quantity"],
                                 (DateTime)reader["TransacDate"]
                             ));
                         }

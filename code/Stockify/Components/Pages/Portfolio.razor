@@ -6,6 +6,7 @@
 @inject DatabaseHelper DatabaseHelper
 @inject ApiManagerSingleton ApiManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserSession CurrentUser
 
 <PageTitle>Portfolio - Stockify</PageTitle>
 
@@ -79,191 +80,76 @@
 </div>
 
 @code {
-    private List<PortfolioItem> portfolioItems = new();
+    private List<PortfolioItemViewModel> portfolioItems = new();
     private bool isLoading = true;
     private decimal totalValue = 0;
     private decimal globalPercentage = 0;
-    private string userId = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated ?? false)
-        {
-            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
-        }
-
-        await LoadPortfolio();
-        isLoading = false;
-    }
-
-    private async Task LoadPortfolio()
-    {
         try
         {
-            // Ajouter des placeholders pour tester le CSS
-            portfolioItems.Add(new PortfolioItem
+            isLoading = true;
+
+            if (CurrentUser.IsLoggedIn)
             {
-                Ticker = "AAPL",
-                Name = "Apple Inc.",
-                Market = "stocks",
-                Locale = "us",
-                PrimaryExchange = "XNAS",
-                Type = "CS",
-                Active = true,
-                CurrencyName = "USD",
-                OwnedValue = 1500.00f,
-                QuantityOwned = 10.00f,
-                CurrentPrice = 175.50m
-            });
+                int userId = CurrentUser.UserId;
 
-            portfolioItems.Add(new PortfolioItem
-            {
-                Ticker = "GOOGL",
-                Name = "Alphabet Inc.",
-                Market = "stocks",
-                Locale = "us",
-                PrimaryExchange = "XNAS",
-                Type = "CS",
-                Active = true,
-                CurrencyName = "USD",
-                OwnedValue = 2800.00f,
-                QuantityOwned = 45.00f,
-                CurrentPrice = 140.25m
-            });
-
-            portfolioItems.Add(new PortfolioItem
-            {
-                Ticker = "MSFT",
-                Name = "Microsoft Corporation",
-                Market = "stocks",
-                Locale = "us",
-                PrimaryExchange = "XNAS",
-                Type = "CS",
-                Active = true,
-                CurrencyName = "USD",
-                OwnedValue = 2000.00f,
-                QuantityOwned = 8.00f,
-                CurrentPrice = 280.75m
-            });
-
-            portfolioItems.Add(new PortfolioItem
-            {
-                Ticker = "TSLA",
-                Name = "Tesla Inc.",
-                Market = "stocks",
-                Locale = "us",
-                PrimaryExchange = "XNAS",
-                Type = "CS",
-                Active = true,
-                CurrencyName = "USD",
-                OwnedValue = 3500.00f,
-                QuantityOwned = 6.00f,
-                CurrentPrice = 245.30m
-            });
-
-            portfolioItems.Add(new PortfolioItem
-            {
-                Ticker = "AMZN",
-                Name = "Amazon.com Inc.",
-                Market = "stocks",
-                Locale = "us",
-                PrimaryExchange = "XNAS",
-                Type = "CS",
-                Active = true,
-                CurrencyName = "USD",
-                OwnedValue = 1200.00f,
-                QuantityOwned = 3.00f,
-                CurrentPrice = 190.50m
-            });
-
-            // Calculer le total et pourcentage
-            foreach (var item in portfolioItems)
-            {
-                totalValue += (decimal)item.QuantityOwned * item.CurrentPrice;
-            }
-
-            decimal totalInvested = (decimal)portfolioItems.Sum(p => p.OwnedValue);
-            if (totalInvested > 0)
-            {
-                globalPercentage = ((totalValue - totalInvested) / totalInvested) * 100;
-            }
-
-            // Décommenter la section suivante pour charger depuis la base de données
-            /*
-            using (var connection = DatabaseHelper.GetConnection())
-            {
-                await connection.OpenAsync();
-
-                // Récupérer les stocks du portfolio de l'utilisateur
-                var query = @"
-                    SELECT 
-                        s.ticker,
-                        s.name,
-                        s.market,
-                        s.locale,
-                        s.primary_exchange,
-                        s.type,
-                        s.active,
-                        s.currency_name,
-                        SUM(CASE WHEN t.type = 'buy' THEN t.montant ELSE -t.montant END) as owned_value,
-                        SUM(CASE WHEN t.type = 'buy' THEN 1 ELSE -1 END * (t.montant / (SELECT AVG(c.close) FROM dbo.StockClose c WHERE c.ticker = s.ticker))) as quantity_owned
-                    FROM dbo.Stock s
-                    JOIN dbo.Transaction t ON s.ticker = t.stock
-                    JOIN dbo.User u ON u.id = t.userID
-                    WHERE u.id = @userId
-                    GROUP BY s.ticker, s.name, s.market, s.locale, s.primary_exchange, s.type, s.active, s.currency_name
-                    HAVING SUM(CASE WHEN t.type = 'buy' THEN 1 ELSE -1 END * (t.montant / (SELECT AVG(c.close) FROM dbo.StockClose c WHERE c.ticker = s.ticker))) > 0";
-
-                using (var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection))
+                if (userId != -1)
                 {
-                    command.Parameters.AddWithValue("@userId", userId);
+                    // 2. Fetch user stocks from the database
+                    // Assuming DatabaseHelper.GetPortfolio(userId) returns a list of your stock objects
+                    var userStocks = await DatabaseHelper.GetPortfolio(userId);
 
-                    using (var reader = await command.ExecuteReaderAsync())
+                    foreach (var stock in userStocks)
                     {
-                        while (await reader.ReadAsync())
+                        // 3. Fetch real-time price from your ApiManager
+                        // Assuming GetCurrentPrice returns a decimal or float
+                        //var currentPrice = await ApiManager.GetStockAsync(stock.Ticker);
+
+                        portfolioItems.Add(new PortfolioItemViewModel
                         {
-                            var portfolioItem = new PortfolioItem
-                            {
-                                Ticker = reader["ticker"].ToString() ?? "",
-                                Name = reader["name"].ToString() ?? "",
-                                Market = reader["market"].ToString() ?? "",
-                                Locale = reader["locale"].ToString() ?? "",
-                                PrimaryExchange = reader["primary_exchange"].ToString() ?? "",
-                                Type = reader["type"].ToString() ?? "",
-                                Active = (bool)reader["active"],
-                                CurrencyName = reader["currency_name"].ToString() ?? "USD",
-                                OwnedValue = Convert.ToSingle(reader["owned_value"]),
-                                QuantityOwned = Convert.ToSingle(reader["quantity_owned"])
-                            };
-
-                            // Récupérer le prix actuel via l'API
-                            var stockResult = await ApiManager.GetStockAsync(portfolioItem.Ticker);
-                            portfolioItem.CurrentPrice = (decimal)(stockResult?.Close ?? 0);
-
-                            portfolioItems.Add(portfolioItem);
-
-                            // Calculer le total
-                            totalValue += (decimal)portfolioItem.QuantityOwned * portfolioItem.CurrentPrice;
-                        }
+                            Name = stock.StockName,
+                            QuantityOwned = stock.Quantity,
+                            //OwnedValue = currentPrice * (decimal)stock.Quantity, // Total cost basis
+                            //CurrentPrice = (decimal)currentPrice
+                        });
                     }
-                }
 
-                // Calculer le pourcentage de profit/déficit global
-                decimal totalInvested = (decimal)portfolioItems.Sum(p => p.OwnedValue);
-                if (totalInvested > 0)
-                {
-                    globalPercentage = ((totalValue - totalInvested) / totalInvested) * 100;
+                    CalculateTotals();
                 }
             }
-            */
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erreur lors du chargement du portfolio: {ex.Message}");
+            // Log error appropriately
+            Console.WriteLine($"Error loading portfolio: {ex.Message}");
         }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void CalculateTotals()
+    {
+        decimal totalCostBasis = portfolioItems.Sum(item => (decimal)item.OwnedValue);
+        totalValue = portfolioItems.Sum(item => (decimal)item.QuantityOwned * item.CurrentPrice);
+
+        if (totalCostBasis > 0)
+        {
+            globalPercentage = ((totalValue - totalCostBasis) / totalCostBasis) * 100;
+        }
+    }
+
+    // Helper class to hold merged data for the UI
+    public class PortfolioItemViewModel
+    {
+        public string Ticker { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public float QuantityOwned { get; set; }
+        public float OwnedValue { get; set; } // Your purchase cost
+        public decimal CurrentPrice { get; set; }
     }
 }
 

@@ -63,9 +63,9 @@
 @code {
     [Parameter] public string Symbol { get; set; } = "";
 
-    private decimal currentPrice = 0m;
-    private decimal ownedShares = 0m;
-    private decimal inputValue;
+    private float currentPrice = 0f;
+    private float ownedShares = 0f;
+    private float inputValue;
     private bool isSellingByAmount = true;
     private bool isProcessing = false;
     private string errorMessage = "";
@@ -81,14 +81,14 @@
         var api = ApiManagerSingleton.getInstance(Configuration);
         stockData = await api.GetStockAsync(Symbol);
         if (stockData != null)
-            currentPrice = (decimal)stockData.Close;
+            currentPrice = (float)stockData.Close;
 
         // Charger la quantité possédée
         if (Session.IsLoggedIn)
         {
             var portfolio = await DB.GetPortfolio(Session.UserId);
             var item = portfolio.FirstOrDefault(p => p.StockName == Symbol);
-            ownedShares = item.StockName != null ? item.Quantity : 0m;
+            ownedShares = item.StockName != null ? item.Quantity : 0f;
         }
 
         isLoading = false;
@@ -100,7 +100,7 @@
 
         if (isSellingByAmount)
         {
-            decimal sharesToSell = currentPrice > 0 ? inputValue / currentPrice : 0;
+            float sharesToSell = currentPrice > 0 ? inputValue / currentPrice : 0;
             return $"{sharesToSell:F6} actions";
         }
         return (inputValue * currentPrice).ToString("C2");
@@ -108,8 +108,8 @@
 
     private string GetRemainingShares()
     {
-        decimal sharesToSell = isSellingByAmount ? (currentPrice > 0 ? inputValue / currentPrice : 0) : inputValue;
-        decimal remaining = ownedShares - sharesToSell;
+        float sharesToSell = isSellingByAmount ? (currentPrice > 0 ? inputValue / currentPrice : 0) : inputValue;
+        float remaining = ownedShares - sharesToSell;
         return remaining < 0 ? "Insuffisant" : remaining.ToString("F6");
     }
 
@@ -124,8 +124,8 @@
             return;
         }
 
-        decimal sharesToSell = isSellingByAmount ? (currentPrice > 0 ? inputValue / currentPrice : 0) : inputValue;
-        decimal totalGain = sharesToSell * currentPrice;
+        float sharesToSell = isSellingByAmount ? (currentPrice > 0 ? inputValue / currentPrice : 0) : inputValue;
+        float totalGain = sharesToSell * currentPrice;
 
         if (sharesToSell <= 0)
         {
