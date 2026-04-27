@@ -1,0 +1,30 @@
+﻿@using Stockify.Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject UserSession Session
+@inject ProtectedLocalStorage Storage
+@inject NavigationManager Nav
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var userIdResult = await Storage.GetAsync<int>("userId");
+                var nameResult = await Storage.GetAsync<string>("userName");
+
+                if (userIdResult.Success && userIdResult.Value != 0)
+                {
+                    Session.UserId = userIdResult.Value;
+                    Session.Name = nameResult.Success ? nameResult.Value ?? "" : "";
+                    StateHasChanged();
+                }
+            }
+            catch
+            {
+                // Storage pas encore disponible
+            }
+        }
+    }
+}

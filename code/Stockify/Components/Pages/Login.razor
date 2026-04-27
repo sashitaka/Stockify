@@ -1,8 +1,10 @@
 ﻿@page "/login"
 @using Stockify.Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject DatabaseHelper DB
 @inject NavigationManager Nav
 @inject UserSession Session
+@inject ProtectedLocalStorage Storage
 
 <h3>Connexion</h3>
 
@@ -37,8 +39,15 @@
 
         if (userId != -1)
         {
+            string name = await DB.GetUserName(userId);
+
             Session.UserId = userId;
-            Session.Name = await DB.GetUserName(userId);
+            Session.Name = name;
+
+            // Sauvegarder dans le localStorage du navigateur
+            await Storage.SetAsync("userId", userId);
+            await Storage.SetAsync("userName", name);
+
             Nav.NavigateTo("/");
         }
         else

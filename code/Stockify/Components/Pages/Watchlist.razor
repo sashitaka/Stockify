@@ -1,0 +1,197 @@
+﻿@page "/watchlist"
+@using Stockify.Data
+@using Stockify.Business
+@inject DatabaseHelper DB
+@inject UserSession Session
+@inject IConfiguration Configuration
+@inject NavigationManager Nav
+
+<PageTitle>Watchlist - Stockify</PageTitle>
+
+<div class="portfolio-wrapper">
+    <div class="portfolio-header">
+        <h1>Ma Watchlist</h1>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+
+    <div class="form-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <input type="text" class="form-control" placeholder="Ticker (ex: AAPL)" @bind="newTicker" style="max-width: 200px;" />
+        <button class="btn-primary" @onclick="AddStock">Ajouter</button>
+    </div>
+
+    <div class="portfolio-content">
+        @if (isLoading)
+        {
+            <p>Chargement...</p>
+        }
+        else if (watchlistItems.Count == 0)
+        {
+            <p>Aucun stock dans votre watchlist.</p>
+        }
+        else
+        {
+            <table class="portfolio-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Prix actuel</th>
+                        <th>Ouverture</th>
+                        <th>Haut</th>
+                        <th>Bas</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in watchlistItems)
+                    {
+                        var currentTicker = item.Ticker;
+                        <tr class="portfolio-stock">
+                            <td><strong>@item.Ticker</strong></td>
+                            <td>@item.Price.ToString("C2")</td>
+                            <td>@item.Open.ToString("C2")</td>
+                            <td>@item.High.ToString("C2")</td>
+                            <td>@item.Low.ToString("C2")</td>
+                            <td style="display: flex; gap: 8px;">
+                                <button class="btn-primary" style="padding: 4px 12px; font-size: 12px;"
+                                        @onclick='() => Nav.NavigateTo("/achat/" + currentTicker)'>
+                                    Acheter
+                                </button>
+                                <button class="btn-secondary" style="padding: 4px 12px; font-size: 12px; background: #ff4444;"
+                                        @onclick='() => RemoveStock(currentTicker)'>
+                                    Retirer
+                                </button>
+                                
+                                  
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private List<WatchlistItemViewModel> watchlistItems = new();
+    private bool   isLoading      = true;
+    private string newTicker      = "";
+    private string errorMessage   = "";
+    private string successMessage = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(300);
+
+            if (Session.IsLoggedIn)
+                await LoadWatchlist();
+            else
+                isLoading = false;
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadWatchlist()
+    {
+        var api = ApiManagerSingleton.getInstance(Configuration);
+        try
+        {
+            isLoading = true;
+            watchlistItems.Clear();
+
+            var tickers = await DB.GetWatchlist(Session.UserId);
+
+            foreach (var ticker in tickers)
+            {
+                var stockData = await api.GetStockAsync(ticker);
+
+                watchlistItems.Add(new WatchlistItemViewModel
+                {
+                    Ticker = ticker,
+                    Price  = (decimal)(stockData?.Close ?? 0),
+                    Open   = (decimal)(stockData?.Open  ?? 0),
+                    High   = (decimal)(stockData?.High  ?? 0),
+                    Low    = (decimal)(stockData?.Low   ?? 0)
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[LoadWatchlist] Erreur: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task AddStock()
+    {
+        errorMessage   = "";
+        successMessage = "";
+
+        if (!Session.IsLoggedIn)
+        {
+            errorMessage = "Vous devez être connecté.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(newTicker))
+        {
+            errorMessage = "Veuillez entrer un ticker.";
+            return;
+        }
+
+        (bool success, string message) = await DB.AddToWatchlist(Session.UserId, newTicker.ToUpper().Trim());
+
+        if (success)
+        {
+            successMessage = message;
+            newTicker      = "";
+            await LoadWatchlist();
+            StateHasChanged();
+        }
+        else
+        {
+            errorMessage = message;
+        }
+    }
+
+    private async Task RemoveStock(string ticker)
+    {
+        errorMessage   = "";
+        successMessage = "";
+
+        bool success = await DB.RemoveFromWatchlist(Session.UserId, ticker);
+
+        if (success)
+        {
+            successMessage = ticker + " retiré de la watchlist.";
+            watchlistItems.RemoveAll(i => i.Ticker == ticker);
+            StateHasChanged();
+        }
+        else
+        {
+            errorMessage = "Erreur lors de la suppression.";
+        }
+    }
+
+    public class WatchlistItemViewModel
+    {
+        public string  Ticker { get; set; } = string.Empty;
+        public decimal Price  { get; set; }
+        public decimal Open   { get; set; }
+        public decimal High   { get; set; }
+        public decimal Low    { get; set; }
+    }
+}

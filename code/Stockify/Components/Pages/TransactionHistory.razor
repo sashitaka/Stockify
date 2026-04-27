@@ -1,10 +1,8 @@
 @page "/TransactionHistory"
 @using Stockify.Data
 @using Stockify.Business
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization
 @inject DatabaseHelper DatabaseHelper
-@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserSession CurrentUser
 
 <PageTitle>Historique de transaction - Stockify</PageTitle>
 
@@ -30,28 +28,28 @@
                         <th>Date</th>
                         <th>Ticker</th>
                         <th>Type</th>
-                        <th>Montant</th>
+                        <th>Quantité</th>
                         <th>Statut</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var transaction in transactions)
                     {
-                        string rowClass = transaction.Type.ToLower() == "buy" ? "buy" : "sell";
-                        string statusClass = transaction.Type.ToLower() == "buy" ? "text-success" : "text-danger";
-                        string typeLabel = transaction.Type.ToLower() == "buy" ? "Achat" : "Vente";
+                        string rowClass = transaction.TransacType.ToLower() == "buy" ? "buy" : "sell";
+                        string statusClass = transaction.TransacType.ToLower() == "buy" ? "text-success" : "text-danger";
+                        string typeLabel = transaction.TransacType.ToLower() == "buy" ? "Achat" : "Vente";
 
                         <tr class="transaction-row @rowClass">
-                            <td>@transaction.Date</td>
-                            <td><strong>@transaction.Stock</strong></td>
+                            <td>@transaction.TransacDate.ToString("yyyy-MM-dd")</td>
+                            <td><strong>@transaction.StockName</strong></td>
                             <td>
-                                <span class="type-badge @(transaction.Type.ToLower() == "buy" ? "badge-buy" : "badge-sell")">
+                                <span class="type-badge @(transaction.TransacType.ToLower() == "buy" ? "badge-buy" : "badge-sell")">
                                     @typeLabel
                                 </span>
                             </td>
-                            <td>@transaction.Montant.ToString("C")</td>
+                            <td>@transaction.Quantity.ToString("F6")</td>
                             <td class="@statusClass">
-                                @(transaction.Type.ToLower() == "buy" ? "✓ Achat" : "✓ Vente")
+                                @(transaction.TransacType.ToLower() == "buy" ? "✓ Achat" : "✓ Vente")
                             </td>
                         </tr>
                     }
@@ -62,20 +60,11 @@
 </div>
 
 @code {
-    private List<Transaction> transactions = new();
+    private List<TransactionViewModel> transactions = new();
     private bool isLoading = true;
-    private string userId = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated ?? false)
-        {
-            userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
-        }
-
         await LoadTransactionHistory();
         isLoading = false;
     }
@@ -84,59 +73,31 @@
     {
         try
         {
-            // Ajouter des transactions placeholder pour tester le CSS
-            transactions.Add(new Transaction("2024-01-15", 1500.00f, "buy", userId, "AAPL"));
-            transactions.Add(new Transaction("2024-01-14", 2300.50f, "sell", userId, "MSFT"));
-            transactions.Add(new Transaction("2024-01-13", 890.25f, "buy", userId, "GOOGL"));
-            transactions.Add(new Transaction("2024-01-12", 550.75f, "buy", userId, "TSLA"));
-            transactions.Add(new Transaction("2024-01-11", 3200.00f, "sell", userId, "AMZN"));
-            transactions.Add(new Transaction("2024-01-10", 1150.30f, "buy", userId, "META"));
+            if (!CurrentUser.IsLoggedIn) return;
 
-            // Décommenter la section suivante pour charger depuis la base de données
-            /*
-            using (var connection = DatabaseHelper.GetConnection())
+            var history = await DatabaseHelper.GetTransactionHistory(CurrentUser.UserId);
+
+            transactions = history.Select(t => new TransactionViewModel
             {
-                await connection.OpenAsync();
-
-                // Récupérer l'historique des transactions de l'utilisateur
-                var query = @"
-                    SELECT 
-                        t.date,
-                        t.stock,
-                        t.type,
-                        t.montant
-                    FROM dbo.Transaction t
-                    WHERE t.userID = @userId
-                    ORDER BY t.date DESC";
-
-                using (var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@userId", userId);
-
-                    using (var reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            var transaction = new Transaction(
-                                reader["date"].ToString() ?? "",
-                                Convert.ToSingle(reader["montant"]),
-                                reader["type"].ToString() ?? "",
-                                userId,
-                                reader["stock"].ToString() ?? ""
-                            );
-
-                            transactions.Add(transaction);
-                        }
-                    }
-                }
-            }
-            */
+                TransactionID = t.TransactionID,
+                StockName = t.StockName,
+                TransacType = t.Type,
+                Quantity = t.Quantity,
+                TransacDate = t.Date
+            }).ToList();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Erreur lors du chargement de l'historique: {ex.Message}");
         }
     }
+
+    public class TransactionViewModel
+    {
+        public int TransactionID { get; set; }
+        public string StockName { get; set; } = string.Empty;
+        public string TransacType { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public DateTime TransacDate { get; set; }
+    }
 }
-
-

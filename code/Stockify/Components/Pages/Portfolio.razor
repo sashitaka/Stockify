@@ -1,11 +1,7 @@
 @page "/portfolio"
 @using Stockify.Data
 @using Stockify.Business
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization
 @inject DatabaseHelper DatabaseHelper
-@inject ApiManagerSingleton ApiManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserSession CurrentUser
 @inject IConfiguration Configuration
 
@@ -34,21 +30,17 @@
                         <th>Nom de la compagnie</th>
                         <th>Quantité</th>
                         <th>Valeur actuelle du Stock</th>
-                        <th>Valeur totale actuelle possede</th>
+                        <th>Valeur totale actuelle possédée</th>
                         <th>Profit/Déficit %</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in portfolioItems)
                     {
-                        // Calculate values based on the data we HAVE
                         double itemValue = item.QuantityOwned * item.CurrentPrice;
-        
-                        // Note: OwnedValue is currently set to current price in your loop,
-                        // so profit will show as 0% for now.
                         double profit = itemValue - item.OwnedValue;
                         double profitPercentage = item.OwnedValue > 0 ? (profit / item.OwnedValue) * 100 : 0;
-        
+
                         <tr class="portfolio-stock">
                             <td><strong>@item.Ticker</strong></td>
                             <td>@item.Name</td>
@@ -72,7 +64,27 @@
     private decimal totalValue = 0;
     private decimal globalPercentage = 0;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Attendre que SessionInitializer ait le temps de charger
+            await Task.Delay(300);
+
+            if (CurrentUser.IsLoggedIn)
+            {
+                await LoadPortfolio();
+                StateHasChanged();
+            }
+            else
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task LoadPortfolio()
     {
         var api = ApiManagerSingleton.getInstance(Configuration);
         try
@@ -80,66 +92,53 @@
             isLoading = true;
             portfolioItems.Clear();
 
-            if (CurrentUser.IsLoggedIn && CurrentUser.UserId != -1)
+            var userStocks = await DatabaseHelper.GetPortfolio(CurrentUser.UserId);
+
+            foreach (var stock in userStocks)
             {
+                var stockData = await api.GetStockAsync(stock.StockName);
 
-                    // 2. Fetch user stocks from the database
-                    // Assuming DatabaseHelper.GetPortfolio(userId) returns a list of your stock objects
-                var userStocks = await DatabaseHelper.GetPortfolio(CurrentUser.UserId);
+                double currentPrice = stockData?.Close ?? 0;
+                string ticker = stock.StockName;
+                string companyName = stockData?.Ticker ?? stock.StockName;
 
-                    foreach (var stock in userStocks)
-                    {
-                        // get price first into a local variable
-                        double currentPrice = await api.GetPriceByNameAsync(stock.StockName);
-						string ticker = await api.GetTickerBySearchAsync(stock.StockName);
-
-                        portfolioItems.Add(new PortfolioItemViewModel
-                        {
-                            Ticker = ticker ?? "N/A",
-                            Name = stock.StockName,
-                            QuantityOwned = (double)stock.Quantity,
-                            CurrentPrice = currentPrice,
-                            OwnedValue = currentPrice * (double)stock.Quantity
-                        });
-                    }
-
-                    CalculateTotals();
-                
+                portfolioItems.Add(new PortfolioItemViewModel
+                {
+                    Ticker = ticker,
+                    Name = companyName,
+                    QuantityOwned = (double)stock.Quantity,
+                    CurrentPrice = currentPrice,
+                    OwnedValue = currentPrice * (double)stock.Quantity
+                });
             }
+
+            CalculateTotals();
         }
         catch (Exception ex)
         {
-            // Log error appropriately
             Console.WriteLine($"Error loading portfolio: {ex.Message}");
         }
         finally
         {
             isLoading = false;
-            StateHasChanged();
         }
     }
 
     private void CalculateTotals()
     {
         decimal totalCostBasis = portfolioItems.Sum(item => (decimal)item.OwnedValue);
-        totalValue = portfolioItems.Sum(item => (decimal)(item.QuantityOwned * (float)item.CurrentPrice));
+        totalValue = portfolioItems.Sum(item => (decimal)(item.QuantityOwned * item.CurrentPrice));
 
         if (totalCostBasis > 0)
-        {
             globalPercentage = ((totalValue - totalCostBasis) / totalCostBasis) * 100;
-        }
     }
 
-    // Helper class to hold merged data for the UI
     public class PortfolioItemViewModel
     {
         public string Ticker { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public double QuantityOwned { get; set; }
-        public double OwnedValue { get; set; } // Your purchase cost
+        public double OwnedValue { get; set; }
         public double CurrentPrice { get; set; }
     }
 }
-
-
-

@@ -17,9 +17,6 @@ namespace Stockify.Data
             return new SqlConnection(_connectionString);
         }
 
-        /// <summary>
-        /// Vérifie les identifiants. Retourne le UserID si succès, -1 si échec.
-        /// </summary>
         public async Task<int> Login(string email, string password)
         {
             string query = "SELECT UserID, PasswordHashed FROM Users WHERE Email = @email";
@@ -28,7 +25,6 @@ namespace Stockify.Data
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 cmd.Parameters.Add("@email", SqlDbType.NVarChar).Value = email;
-
                 try
                 {
                     await conn.OpenAsync();
@@ -38,7 +34,6 @@ namespace Stockify.Data
                         {
                             string storedHash = reader["PasswordHashed"].ToString();
                             int userId = (int)reader["UserID"];
-
                             if (storedHash.Trim() == password.Trim())
                                 return userId;
                         }
@@ -52,9 +47,6 @@ namespace Stockify.Data
             return -1;
         }
 
-        /// <summary>
-        /// Crée un nouveau compte. Retourne (true, message) si succès.
-        /// </summary>
         public async Task<(bool success, string message)> Register(string name, string email, string password)
         {
             string checkQuery = "SELECT COUNT(*) FROM Users WHERE Email = @email";
@@ -65,13 +57,10 @@ namespace Stockify.Data
                 try
                 {
                     await conn.OpenAsync();
-                    Console.WriteLine($"[Register] Connecté à: {conn.DataSource} / {conn.Database}");
-
                     using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                     {
                         checkCmd.Parameters.Add("@email", SqlDbType.NVarChar).Value = email;
                         int count = (int)await checkCmd.ExecuteScalarAsync();
-                        Console.WriteLine($"[Register] Count pour {email}: {count}");
                         if (count > 0) return (false, "Cet email est déjà utilisé.");
                     }
 
@@ -80,7 +69,6 @@ namespace Stockify.Data
                         insertCmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = name;
                         insertCmd.Parameters.Add("@email", SqlDbType.NVarChar).Value = email;
                         insertCmd.Parameters.Add("@password", SqlDbType.NVarChar).Value = password;
-
                         int rows = await insertCmd.ExecuteNonQueryAsync();
                         return rows > 0
                             ? (true, "Compte créé avec succès!")
@@ -95,9 +83,6 @@ namespace Stockify.Data
             }
         }
 
-        /// <summary>
-        /// Retourne le nom d'un utilisateur.
-        /// </summary>
         public async Task<string> GetUserName(int userId)
         {
             string query = "SELECT Name FROM Users WHERE UserID = @userId";
@@ -120,9 +105,6 @@ namespace Stockify.Data
             }
         }
 
-        /// <summary>
-        /// Retourne le solde d'un utilisateur.
-        /// </summary>
         public async Task<decimal> GetBalance(int userId)
         {
             string query = "SELECT Balance FROM Users WHERE UserID = @userId";
@@ -145,9 +127,6 @@ namespace Stockify.Data
             }
         }
 
-        /// <summary>
-        /// Met à jour le solde d'un utilisateur.
-        /// </summary>
         public async Task<bool> UpdateBalance(int userId, decimal newBalance)
         {
             string query = "UPDATE Users SET Balance = @balance WHERE UserID = @userId";
@@ -172,7 +151,7 @@ namespace Stockify.Data
         }
 
         /// <summary>
-        /// Achète une quantité de stock pour un utilisateur.
+        /// Achète une quantité de stock. Utilise StockName directement.
         /// </summary>
         public async Task<(bool success, string message)> BuyStock(int userId, string ticker, decimal quantity, decimal totalCost)
         {
@@ -195,50 +174,29 @@ namespace Stockify.Data
                         if (balance < totalCost)
                             return (false, "Solde insuffisant.");
 
-                        // Récupérer ou créer le stock
-                        int stockId;
-                        using (SqlCommand stockCmd = new SqlCommand("SELECT StockID FROM Stocks WHERE StockName = @ticker", conn, transaction))
-                        {
-                            stockCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
-                            var result = await stockCmd.ExecuteScalarAsync();
-
-                            if (result != null)
-                            {
-                                stockId = (int)result;
-                            }
-                            else
-                            {
-                                using (SqlCommand insertStock = new SqlCommand("INSERT INTO Stocks (StockName) OUTPUT INSERTED.StockID VALUES (@ticker)", conn, transaction))
-                                {
-                                    insertStock.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
-                                    stockId = (int)await insertStock.ExecuteScalarAsync();
-                                }
-                            }
-                        }
-
-                        // Mettre à jour le portfolio
-                        using (SqlCommand checkCmd = new SqlCommand("SELECT Quantity FROM PortfolioItems WHERE UserID = @userId AND StockID = @stockId", conn, transaction))
+                        // Vérifier si le stock existe déjà dans le portfolio
+                        using (SqlCommand checkCmd = new SqlCommand("SELECT Quantity FROM PortfolioItems WHERE UserID = @userId AND StockName = @ticker", conn, transaction))
                         {
                             checkCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                            checkCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                            checkCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                             var existing = await checkCmd.ExecuteScalarAsync();
 
                             if (existing != null)
                             {
-                                using (SqlCommand updateCmd = new SqlCommand("UPDATE PortfolioItems SET Quantity = Quantity + @qty WHERE UserID = @userId AND StockID = @stockId", conn, transaction))
+                                using (SqlCommand updateCmd = new SqlCommand("UPDATE PortfolioItems SET Quantity = Quantity + @qty WHERE UserID = @userId AND StockName = @ticker", conn, transaction))
                                 {
                                     updateCmd.Parameters.Add("@qty", SqlDbType.Decimal).Value = quantity;
                                     updateCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                                    updateCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                                    updateCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                                     await updateCmd.ExecuteNonQueryAsync();
                                 }
                             }
                             else
                             {
-                                using (SqlCommand insertCmd = new SqlCommand("INSERT INTO PortfolioItems (UserID, StockID, Quantity) VALUES (@userId, @stockId, @qty)", conn, transaction))
+                                using (SqlCommand insertCmd = new SqlCommand("INSERT INTO PortfolioItems (UserID, StockName, Quantity) VALUES (@userId, @ticker, @qty)", conn, transaction))
                                 {
                                     insertCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                                    insertCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                                    insertCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                                     insertCmd.Parameters.Add("@qty", SqlDbType.Decimal).Value = quantity;
                                     await insertCmd.ExecuteNonQueryAsync();
                                 }
@@ -253,11 +211,11 @@ namespace Stockify.Data
                             await updateBal.ExecuteNonQueryAsync();
                         }
 
-                        // Enregistrer la transaction
-                        using (SqlCommand transCmd = new SqlCommand("INSERT INTO Transactions (UserID, StockID, TransacType, Quantity, TransacDate) VALUES (@userId, @stockId, 'BUY', @qty, @date)", conn, transaction))
+                        // Enregistrer la transaction avec StockName
+                        using (SqlCommand transCmd = new SqlCommand("INSERT INTO Transactions (UserID, StockName, TransacType, Quantity, TransacDate) VALUES (@userId, @ticker, 'BUY', @qty, @date)", conn, transaction))
                         {
                             transCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                            transCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                            transCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                             transCmd.Parameters.Add("@qty", SqlDbType.Decimal).Value = quantity;
                             transCmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.Today;
                             await transCmd.ExecuteNonQueryAsync();
@@ -277,9 +235,9 @@ namespace Stockify.Data
         }
 
         /// <summary>
-        /// Vend une quantité de stock pour un utilisateur.
+        /// Vend une quantité de stock. Utilise StockName directement.
         /// </summary>
-        public async Task<(bool success, string message)> SellStock(int userId, string ticker, float quantity, float totalGain)
+        public async Task<(bool success, string message)> SellStock(int userId, string ticker, decimal quantity, decimal totalGain)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -288,25 +246,15 @@ namespace Stockify.Data
                 {
                     try
                     {
-                        // Récupérer le StockID
-                        int stockId;
-                        using (SqlCommand stockCmd = new SqlCommand("SELECT StockID FROM Stocks WHERE StockName = @ticker", conn, transaction))
-                        {
-                            stockCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
-                            var result = await stockCmd.ExecuteScalarAsync();
-                            if (result == null) return (false, "Stock introuvable.");
-                            stockId = (int)result;
-                        }
-
                         // Vérifier la quantité disponible
-                        float currentQty;
-                        using (SqlCommand checkCmd = new SqlCommand("SELECT Quantity FROM PortfolioItems WHERE UserID = @userId AND StockID = @stockId", conn, transaction))
+                        decimal currentQty;
+                        using (SqlCommand checkCmd = new SqlCommand("SELECT Quantity FROM PortfolioItems WHERE UserID = @userId AND StockName = @ticker", conn, transaction))
                         {
                             checkCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                            checkCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                            checkCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                             var result = await checkCmd.ExecuteScalarAsync();
                             if (result == null) return (false, "Vous ne possédez pas ce stock.");
-                            currentQty = (float)result;
+                            currentQty = (decimal)result;
                         }
 
                         if (currentQty < quantity)
@@ -315,20 +263,20 @@ namespace Stockify.Data
                         // Mettre à jour ou supprimer du portfolio
                         if (currentQty == quantity)
                         {
-                            using (SqlCommand deleteCmd = new SqlCommand("DELETE FROM PortfolioItems WHERE UserID = @userId AND StockID = @stockId", conn, transaction))
+                            using (SqlCommand deleteCmd = new SqlCommand("DELETE FROM PortfolioItems WHERE UserID = @userId AND StockName = @ticker", conn, transaction))
                             {
                                 deleteCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                                deleteCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                                deleteCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                                 await deleteCmd.ExecuteNonQueryAsync();
                             }
                         }
                         else
                         {
-                            using (SqlCommand updateCmd = new SqlCommand("UPDATE PortfolioItems SET Quantity = Quantity - @qty WHERE UserID = @userId AND StockID = @stockId", conn, transaction))
+                            using (SqlCommand updateCmd = new SqlCommand("UPDATE PortfolioItems SET Quantity = Quantity - @qty WHERE UserID = @userId AND StockName = @ticker", conn, transaction))
                             {
                                 updateCmd.Parameters.Add("@qty", SqlDbType.Decimal).Value = quantity;
                                 updateCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                                updateCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                                updateCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                                 await updateCmd.ExecuteNonQueryAsync();
                             }
                         }
@@ -341,11 +289,11 @@ namespace Stockify.Data
                             await updateBal.ExecuteNonQueryAsync();
                         }
 
-                        // Enregistrer la transaction
-                        using (SqlCommand transCmd = new SqlCommand("INSERT INTO Transactions (UserID, StockID, TransacType, Quantity, TransacDate) VALUES (@userId, @stockId, 'SELL', @qty, @date)", conn, transaction))
+                        // Enregistrer la transaction avec StockName
+                        using (SqlCommand transCmd = new SqlCommand("INSERT INTO Transactions (UserID, StockName, TransacType, Quantity, TransacDate) VALUES (@userId, @ticker, 'SELL', @qty, @date)", conn, transaction))
                         {
                             transCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-                            transCmd.Parameters.Add("@stockId", SqlDbType.Int).Value = stockId;
+                            transCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
                             transCmd.Parameters.Add("@qty", SqlDbType.Decimal).Value = quantity;
                             transCmd.Parameters.Add("@date", SqlDbType.Date).Value = DateTime.Today;
                             await transCmd.ExecuteNonQueryAsync();
@@ -370,25 +318,21 @@ namespace Stockify.Data
         public async Task<List<(string StockName, decimal Quantity)>> GetPortfolio(int userId)
         {
             var portfolio = new List<(string StockName, decimal Quantity)>();
-
-            // Cleaned up the query string
             string query = "SELECT StockName, Quantity FROM PortfolioItems WHERE UserID = @userId";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
                 cmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
-
                 try
                 {
                     await conn.OpenAsync();
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
-                        { 
+                        {
                             string name = reader["StockName"]?.ToString() ?? string.Empty;
                             decimal qty = (decimal)reader["Quantity"];
-
                             portfolio.Add((name, qty));
                         }
                     }
@@ -404,14 +348,13 @@ namespace Stockify.Data
         /// <summary>
         /// Retourne l'historique des transactions d'un utilisateur.
         /// </summary>
-        public async Task<List<(int TransactionID, string StockName, string Type, float Quantity, DateTime Date)>> GetTransactionHistory(int userId)
+        public async Task<List<(int TransactionID, string StockName, string Type, decimal Quantity, DateTime Date)>> GetTransactionHistory(int userId)
         {
-            var history = new List<(int, string, string, float, DateTime)>();
-            string query = @"SELECT t.TransactionID, s.StockName, t.TransacType, t.Quantity, t.TransacDate
-                             FROM Transactions t
-                             JOIN Stocks s ON t.StockID = s.StockID
-                             WHERE t.UserID = @userId
-                             ORDER BY t.TransacDate DESC";
+            var history = new List<(int, string, string, decimal, DateTime)>();
+            string query = @"SELECT TransactionID, StockName, TransacType, Quantity, TransacDate
+                             FROM Transactions
+                             WHERE UserID = @userId
+                             ORDER BY TransacDate DESC";
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -428,7 +371,7 @@ namespace Stockify.Data
                                 (int)reader["TransactionID"],
                                 reader["StockName"].ToString(),
                                 reader["TransacType"].ToString(),
-                                (float)reader["Quantity"],
+                                (decimal)reader["Quantity"],
                                 (DateTime)reader["TransacDate"]
                             ));
                         }
@@ -441,5 +384,103 @@ namespace Stockify.Data
             }
             return history;
         }
+
+        /// <summary>
+        /// Retourne la watchlist d'un utilisateur.
+        /// </summary>
+        public async Task<List<string>> GetWatchlist(int userId)
+        {
+            var watchlist = new List<string>();
+            string query = "SELECT StockName FROM Watchlist WHERE UserID = @userId";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+                try
+                {
+                    await conn.OpenAsync();
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                            watchlist.Add(reader["StockName"].ToString()!);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[GetWatchlist] Erreur: {ex.Message}");
+                }
+            }
+            return watchlist;
+        }
+
+        /// <summary>
+        /// Ajoute un stock à la watchlist.
+        /// </summary>
+        public async Task<(bool success, string message)> AddToWatchlist(int userId, string ticker)
+        {
+            string checkQuery = "SELECT COUNT(*) FROM Watchlist WHERE UserID = @userId AND StockName = @ticker";
+            string insertQuery = "INSERT INTO Watchlist (UserID, StockName) VALUES (@userId, @ticker)";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+
+                    using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                    {
+                        checkCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+                        checkCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
+                        int count = (int)await checkCmd.ExecuteScalarAsync();
+                        if (count > 0) return (false, "Stock déjà dans la watchlist.");
+                    }
+
+                    using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                    {
+                        insertCmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+                        insertCmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
+                        int rows = await insertCmd.ExecuteNonQueryAsync();
+                        return rows > 0
+                            ? (true, "Stock ajouté à la watchlist!")
+                            : (false, "Erreur lors de l'ajout.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[AddToWatchlist] Erreur: {ex.Message}");
+                    return (false, $"Erreur: {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Supprime un stock de la watchlist.
+        /// </summary>
+        public async Task<bool> RemoveFromWatchlist(int userId, string ticker)
+        {
+            string query = "DELETE FROM Watchlist WHERE UserID = @userId AND StockName = @ticker";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+                cmd.Parameters.Add("@ticker", SqlDbType.NVarChar).Value = ticker;
+                try
+                {
+                    await conn.OpenAsync();
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    return rows > 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[RemoveFromWatchlist] Erreur: {ex.Message}");
+                    return false;
+                }
+            }
+        }
+
+
+
     }
 }

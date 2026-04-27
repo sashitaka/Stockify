@@ -1,0 +1,20 @@
+﻿@page "/logout"
+@using Stockify.Data
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject NavigationManager Nav
+@inject UserSession Session
+@inject ProtectedLocalStorage Storage
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Session.UserId = -1;
+            Session.Name = "";
+            await Storage.DeleteAsync("userId");
+            await Storage.DeleteAsync("userName");
+            Nav.NavigateTo("/login");
+        }
+    }
+}

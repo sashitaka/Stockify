@@ -482,3 +482,7 @@ $RECYCLE.BIN/
 *.swp
 
 **/appsettings.Development.json
+
+*.mdf
+*.ldf
+*.ndf
