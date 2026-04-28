@@ -5,16 +5,33 @@
 @inject UserSession Session
 @inject ProtectedLocalStorage Storage
 
-@code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+<div class="logout-container">
+    @if (isProcessing)
     {
-        if (firstRender)
-        {
-            Session.UserId = -1;
-            Session.Name = "";
-            await Storage.DeleteAsync("userId");
-            await Storage.DeleteAsync("userName");
-            Nav.NavigateTo("/login");
-        }
+        <div class="spinner"></div>
+        <p>Logging you out safely...</p>
+    }
+    else
+    {
+        <p>Redirecting...</p>
+    }
+</div>
+
+@code {
+    private bool isProcessing = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Session.UserId = -1;
+        Session.Name = "";
+
+        // Artificial delay for the "real website" feel
+        await Task.Delay(1000);
+
+        await Storage.DeleteAsync("userId");
+        await Storage.DeleteAsync("userName");
+
+        isProcessing = false;
+        Nav.NavigateTo("/login");
     }
 }
