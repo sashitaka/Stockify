@@ -33,8 +33,7 @@ namespace Stockify.Business
         {
             string? ticker = input.Trim().ToUpper();
 
-            // If the input contains spaces or looks like a company name (not a typical ticker),
-            // search for it first
+         
             if (input.Contains(" ") || input.Length >= 5)
             {
                 var searchedTicker = await GetTickerBySearchAsync(input);
@@ -44,10 +43,10 @@ namespace Stockify.Business
                 }
                 else if (input.Length >= 5)
                 {
-                    // If search failed and input is >= 5 chars, it's probably not a valid ticker
+                   
                     return null;
                 }
-                // If search failed but input is < 5 chars, try it as a ticker anyway
+                
             }
 
             if (string.IsNullOrEmpty(ticker)) return null;
@@ -187,7 +186,7 @@ namespace Stockify.Business
 
         [JsonPropertyName("n")] public long N { get; set; }
     }
-        // This matches the top-level JSON object from the /v3/reference/tickers endpoint
+       
         public class MassiveTickerResponse
         {
             [JsonPropertyName("results")]
@@ -197,7 +196,7 @@ namespace Stockify.Business
             public string? Status { get; set; }
         }
 
-        // This matches each individual result in the list
+        
         public class TickerSearchResult
         {
             [JsonPropertyName("ticker")]

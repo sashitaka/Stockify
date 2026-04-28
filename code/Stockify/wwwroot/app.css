@@ -541,7 +541,7 @@ a {
     /* ===== BLAZOR ERROR ===== */
     #blazor-error-ui {
         background: #b32121;
-        color: white;
+x        color: white;
         padding: 10px 20px;
         position: fixed;
         bottom: 0;
@@ -693,3 +693,65 @@ a {
         overflow: hidden;
         border: 1px solid #2a2a4a;
     }
+
+
+/* ── Watchlist ───────────────────────────────────────────── */
+.watchlist-add-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+    .watchlist-add-form .form-control {
+        max-width: 200px;
+    }
+
+.watchlist-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-danger {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: #ff4444;
+}
+
+.btn-small {
+    padding: 4px 12px;
+    font-size: 12px;
+}
+
+/* ── Sell ────────────────────────────────────────────────── */
+.owned-shares {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.owned-shares-value {
+    color: #ff4444;
+    font-weight: bold;
+}
+
+.sell-select {
+    background: #2a2a2a;
+    width: 100%;
+    cursor: pointer;
+}
+
+.sell-estimation {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.credit-value {
+    color: #00c853;
+}
+
+.btn-sell {
+    background: #ff4444;
+}
+
+.btn-cancel {
+    margin-top: 10px;
+}

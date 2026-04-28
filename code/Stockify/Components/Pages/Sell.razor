@@ -13,8 +13,8 @@
             <div class="stock-price">@currentPrice.ToString("C2")</div>
         </div>
 
-        <p class="auth-subtitle" style="text-align: left; margin-bottom: 20px;">
-            Actions possédées: <span style="color: #ff4444; font-weight: bold;">@ownedShares.ToString("F6")</span>
+        <p class="auth-subtitle owned-shares">
+            Actions possédées: <span class="owned-shares-value">@ownedShares.ToString("F6")</span>
         </p>
 
         @if (!string.IsNullOrEmpty(errorMessage))
@@ -28,7 +28,7 @@
 
         <div class="form-group">
             <label>Mode de vente</label>
-            <select @bind="isSellingByAmount" class="form-group input" style="background: #2a2a2a; width: 100%; cursor: pointer;">
+            <select @bind="isSellingByAmount" class="form-group input sell-select">
                 <option value="true">Vendre par Montant ($)</option>
                 <option value="false">Vendre par Quantité (Actions)</option>
             </select>
@@ -39,10 +39,10 @@
             <input type="number" step="0.01" @bind="inputValue" @bind:event="oninput" placeholder="0.00" />
         </div>
 
-        <div class="stock-details" style="margin-top: 20px; margin-bottom: 20px;">
+        <div class="stock-details sell-estimation">
             <div class="detail-item">
                 <span class="detail-label">Crédit estimé</span>
-                <span class="detail-value" style="color: #00c853;">@GetEstimation()</span>
+                <span class="detail-value credit-value">@GetEstimation()</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Actions restantes</span>
@@ -50,11 +50,11 @@
             </div>
         </div>
 
-        <button class="btn-primary" style="background: #ff4444;" @onclick="ConfirmSale" disabled="@isProcessing">
+        <button class="btn-primary btn-sell" @onclick="ConfirmSale" disabled="@isProcessing">
             @(isProcessing ? "Transaction..." : "Confirmer la vente")
         </button>
 
-        <button class="btn-secondary" style="margin-top: 10px;" @onclick='() => Navigation.NavigateTo("/")'>
+        <button class="btn-secondary btn-cancel" @onclick='() => Navigation.NavigateTo("/")'>
             Annuler
         </button>
     </div>

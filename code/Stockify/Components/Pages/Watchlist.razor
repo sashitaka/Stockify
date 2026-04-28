@@ -22,8 +22,8 @@
         <div class="alert alert-success">@successMessage</div>
     }
 
-    <div class="form-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <input type="text" class="form-control" placeholder="Ticker (ex: AAPL)" @bind="newTicker" style="max-width: 200px;" />
+    <div class="form-group watchlist-add-form">
+        <input type="text" class="form-control" placeholder="Ticker (ex: AAPL)" @bind="newTicker" />
         <button class="btn-primary" @onclick="AddStock">Ajouter</button>
     </div>
 
@@ -59,17 +59,15 @@
                             <td>@item.Open.ToString("C2")</td>
                             <td>@item.High.ToString("C2")</td>
                             <td>@item.Low.ToString("C2")</td>
-                            <td style="display: flex; gap: 8px;">
-                                <button class="btn-primary" style="padding: 4px 12px; font-size: 12px;"
+                            <td class="watchlist-actions">
+                                <button class="btn-primary btn-small"
                                         @onclick='() => Nav.NavigateTo("/achat/" + currentTicker)'>
                                     Acheter
                                 </button>
-                                <button class="btn-secondary" style="padding: 4px 12px; font-size: 12px; background: #ff4444;"
+                                <button class="btn-danger btn-small"
                                         @onclick='() => RemoveStock(currentTicker)'>
                                     Retirer
                                 </button>
-                                
-                                  
                             </td>
                         </tr>
                     }
@@ -81,9 +79,9 @@
 
 @code {
     private List<WatchlistItemViewModel> watchlistItems = new();
-    private bool   isLoading      = true;
-    private string newTicker      = "";
-    private string errorMessage   = "";
+    private bool isLoading = true;
+    private string newTicker = "";
+    private string errorMessage = "";
     private string successMessage = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -118,10 +116,10 @@
                 watchlistItems.Add(new WatchlistItemViewModel
                 {
                     Ticker = ticker,
-                    Price  = (decimal)(stockData?.Close ?? 0),
-                    Open   = (decimal)(stockData?.Open  ?? 0),
-                    High   = (decimal)(stockData?.High  ?? 0),
-                    Low    = (decimal)(stockData?.Low   ?? 0)
+                    Price = (decimal)(stockData?.Close ?? 0),
+                    Open = (decimal)(stockData?.Open ?? 0),
+                    High = (decimal)(stockData?.High ?? 0),
+                    Low = (decimal)(stockData?.Low ?? 0)
                 });
             }
         }
@@ -137,7 +135,7 @@
 
     private async Task AddStock()
     {
-        errorMessage   = "";
+        errorMessage = "";
         successMessage = "";
 
         if (!Session.IsLoggedIn)
@@ -157,7 +155,7 @@
         if (success)
         {
             successMessage = message;
-            newTicker      = "";
+            newTicker = "";
             await LoadWatchlist();
             StateHasChanged();
         }
@@ -169,7 +167,7 @@
 
     private async Task RemoveStock(string ticker)
     {
-        errorMessage   = "";
+        errorMessage = "";
         successMessage = "";
 
         bool success = await DB.RemoveFromWatchlist(Session.UserId, ticker);
@@ -188,10 +186,10 @@
 
     public class WatchlistItemViewModel
     {
-        public string  Ticker { get; set; } = string.Empty;
-        public decimal Price  { get; set; }
-        public decimal Open   { get; set; }
-        public decimal High   { get; set; }
-        public decimal Low    { get; set; }
+        public string Ticker { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public decimal Open { get; set; }
+        public decimal High { get; set; }
+        public decimal Low { get; set; }
     }
 }
