@@ -1,0 +1,115 @@
+﻿@page "/MonCompte"
+@using Stockify.Data
+@using Stockify.Business
+@inject DatabaseHelper DatabaseHelper
+@inject UserSession CurrentUser
+
+<div class="account-settings-wrapper">
+    <div class="account-header">
+        <h1>Mon Compte</h1>
+        <p class="account-subtitle">Gérez vos informations personnelles et votre solde</p>
+    </div>
+
+    <div class="account-card">
+        <EditForm Model="@userProfile" OnValidSubmit="EnregistrerInfos">
+            <DataAnnotationsValidator />
+
+            <div class="form-section">
+                <div class="form-group">
+                    <label>Adresse Courriel</label>
+                    <InputText @bind-Value="userProfile.Email" class="form-control" placeholder="nom@exemple.com" />
+                    <ValidationMessage For="@(() => userProfile.Email)" />
+                </div>
+
+                <div class="form-group">
+                    <label>Nouveau Mot de Passe</label>
+                    <InputText @bind-Value="userProfile.Password" type="password" class="form-control" placeholder="••••••••" />
+                    <ValidationMessage For="@(() => userProfile.Password)" />
+                </div>
+            </div>
+
+            <div class="balance-card-embedded">
+                <span class="detail-label">SOLDE DISPONIBLE</span>
+                <div class="balance-input-wrapper">
+                    <span class="currency-symbol">$</span>
+                    <InputNumber @bind-Value="userProfile.Balance" class="balance-field" />
+                </div>
+            </div>
+
+            @if (showSuccess)
+            {
+                <div class="success-box">Profil mis à jour avec succès.</div>
+            }
+
+            <div class="account-actions">
+                <button type="submit" class="btn-primary" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner"></span>
+                        <span>Mise à jour...</span>
+                    }
+                    else
+                    {
+                        <span>Enregistrer les modifications</span>
+                    }
+                </button>
+                <button type="button" class="btn-secondary" @onclick="ResetForm" disabled="@isSubmitting">
+                    Annuler
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private UserProfile userProfile = new();
+    private bool showSuccess = false;
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userProfile = new UserProfile
+        {
+            Email = CurrentUser.Email,
+            Password = CurrentUser.Password,
+			Balance = CurrentUser.Balance
+        };
+    }
+
+    private async Task EnregistrerInfos()
+    {
+        isSubmitting = true; // Déclenche l'écran de chargement visuel
+        showSuccess = false;
+
+        bool success = await DatabaseHelper.UpdateInfos(
+            CurrentUser.UserId,
+            userProfile.Email,
+            userProfile.Password,
+            userProfile.Balance
+        );
+
+        if (success)
+        {
+            showSuccess = true;
+            isSubmitting = false;
+            await Task.Delay(1000);
+            showSuccess = false;
+        }
+        else
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task ResetForm()
+    {
+        await OnInitializedAsync();
+    }
+
+    public class UserProfile
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public decimal Balance { get; set; }
+    }
+}

@@ -9,7 +9,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border-left-color: #09f; /* You can change this to match your app's theme */
+    border-left-color: #09f;
     margin: 0 auto 20px;
     animation: spin 1s linear infinite;
 }

@@ -105,6 +105,51 @@ namespace Stockify.Data
             }
         }
 
+        public async Task<string> GetEmail(int userId)
+        {
+            string query = "SELECT Email FROM Users WHERE UserID = @userId";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+                try
+                {
+                    await conn.OpenAsync();
+                    var result = await cmd.ExecuteScalarAsync();
+                    return result?.ToString() ?? "";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[GetEmail] Erreur: {ex.Message}");
+                    return "";
+                }
+            }
+        }
+
+        public async Task<string> GetPassword(int userId)
+        {
+            string query = "SELECT PasswordHashed FROM Users WHERE UserID = @userId";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+                try
+                {
+                    await conn.OpenAsync();
+                    var result = await cmd.ExecuteScalarAsync();
+                    return result?.ToString() ?? "";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[GetPassword] Erreur: {ex.Message}");
+                    return "";
+                }
+            }
+        }
+
+
         public async Task<decimal> GetBalance(int userId)
         {
             string query = "SELECT Balance FROM Users WHERE UserID = @userId";
@@ -149,6 +194,35 @@ namespace Stockify.Data
                 }
             }
         }
+
+        public async Task<bool> UpdateInfos(int userId, string newEmail, string newPassword, decimal newBalance)
+        {
+            string query = "UPDATE Users SET Email = @Email," +
+                " PasswordHashed = @Password," +
+                " Balance = @Balance" +
+                " WHERE UserID = @userId";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = newEmail;
+                cmd.Parameters.Add("@Password", SqlDbType.NVarChar).Value = newPassword;
+                cmd.Parameters.Add("@Balance", SqlDbType.Decimal).Value = newBalance;
+                cmd.Parameters.Add("@userId", SqlDbType.Int).Value = userId;
+                try
+                {
+                    await conn.OpenAsync();
+                    int rows = await cmd.ExecuteNonQueryAsync();
+                    return rows > 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[UpdateInfos] Erreur: {ex.Message}");
+                    return false;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Achète une quantité de stock. Utilise StockName directement.

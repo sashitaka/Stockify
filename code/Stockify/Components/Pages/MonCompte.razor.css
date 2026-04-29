@@ -1,0 +1,180 @@
+﻿.account-settings-wrapper {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.account-header {
+    margin-bottom: 30px;
+}
+
+    .account-header h1 {
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+.account-subtitle {
+    color: #888;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.account-card {
+    background: #1a1a1a;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+/* Reusing your form-group styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+    .form-group label {
+        color: #aaa;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+    .form-control:focus {
+        border-color: #00c853;
+    }
+
+/* Specialized Balance Section */
+.balance-card-embedded {
+    background: #0d0d1f; /* Matching your chart background */
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.detail-label {
+    color: #888;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.balance-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.currency-symbol {
+    font-size: 24px;
+    color: #00c853;
+    font-weight: bold;
+}
+
+.balance-field {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    width: 200px;
+    text-align: left;
+    outline: none;
+}
+
+/* Button & Action area */
+.account-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Inherits your .btn-primary and .btn-secondary from the main CSS */
+
+.account-settings-wrapper {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.account-card {
+    background: #1a1a1a;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.balance-card-embedded {
+    background: #0d0d1f;
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.balance-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.balance-field {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    width: 180px;
+    outline: none;
+}
+
+/* Actions & Loading */
+.account-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-primary:disabled {
+    background: #00a846;
+    opacity: 0.8;
+    cursor: not-allowed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
