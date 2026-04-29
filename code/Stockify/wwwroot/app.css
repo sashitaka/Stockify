@@ -694,17 +694,24 @@ x        color: white;
         border: 1px solid #2a2a4a;
     }
 
-
+}
 /* ── Watchlist ───────────────────────────────────────────── */
 .watchlist-add-form {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-}
+}°
 
     .watchlist-add-form .form-control {
         max-width: 200px;
+        background: #1a1a2e;
+        color: #ffffff;
+        border: 1px solid #444466;
     }
+
+        .watchlist-add-form .form-control::placeholder {
+            color: #8888aa;
+        }
 
 .watchlist-actions {
     display: flex;
@@ -712,9 +719,11 @@ x        color: white;
 }
 
 .btn-danger {
-    padding: 4px 12px;
-    font-size: 12px;
     background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 .btn-small {
